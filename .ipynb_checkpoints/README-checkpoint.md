@@ -27,9 +27,30 @@ python -c "import torch; print(torch.__version__)"
 
 ### torch_scatter
 
+```bash 
+pip install torch_scatter-2.0.9-cp38-cp38-linux_x86_64.whl
+```
+
 ### torch_sparse
 
+```bash 
+pip install torch_sparse-0.6.13-cp38-cp38-linux_x86_64.whl
+```
+
 ### dgl
+
+```bash
+pip install dgl-cu113 -f https://data.dgl.ai/wheels/repo.html
+```
+
+**初次安装会提示：DGL backend not selected or invalid. Assuming PyTorch for now.
+Setting the default backend to "pytorch". You can change it in the <span style="color:red;">~/.dgl/config.json</span> file or export the DGLBACKEND environment variable. Valid options are: pytorch, mxnet, tensorflow (all lowercase)
+Downloading https://raw.githubusercontent.com/graphdml-uiuc-jlu/geom-gcn/f1fc0d14b3b019c562737240d06ec83b07d16a8f/new_data/chameleon/out1_node_feature_label.txt
+**
+
+**使用 vim <span style="color:red;">~/.dgl/config.json</span>** 可修改为pytorch或 mxnet或tensorflow
+
+**⚠️** 若torch_scatter以及torch_sparse版本与torch、python、cuda版本对应不上会报错:**Segmentation fault**
 
 # Graph Neural Network Performance on Different Datasets
 
@@ -95,3 +116,9 @@ python -c "import torch; print(torch.__version__)"
 | computers | GDC      | 16     |             |
 | computers | GDC      | 32     |             |
 | computers | GDC      | 64     |             |
+
+## 
+
+$$
+\int_{a}^{b} x^2 dx
+$$

@@ -14,7 +14,7 @@ def parameter_parser():
 
 
     """DATASET"""
-    parser.add_argument("--dataset", type=str, default="Cora",)
+    parser.add_argument("--dataset", type=str, default="citeseer",)
 
     """EXPERIMENT"""
     parser.add_argument("--exp-num", type=int, default=100)
