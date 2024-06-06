@@ -125,3 +125,10 @@ Downloading https://raw.githubusercontent.com/graphdml-uiuc-jlu/geom-gcn/f1fc0d1
 | AERO-GNN | 2      | Accuracy: 0.7838|
 | AERO-GNN | 4      | Accuracy: 0.7568|
 
+
+## cora数据集
+| Model    | Layers |      Performance        |
+|----------|--------|-------------------------|
+| AERO-GNN | 1      | Accuracy: 0.8378        |
+| AERO-GNN | 2      | Accuracy: 0.7838        |
+| AERO-GNN | 4      | accuracy: 0.7312 ± 0.081|
