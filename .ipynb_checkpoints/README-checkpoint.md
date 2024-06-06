@@ -117,8 +117,11 @@ Downloading https://raw.githubusercontent.com/graphdml-uiuc-jlu/geom-gcn/f1fc0d1
 | computers | GDC      | 32     |             |
 | computers | GDC      | 64     |             |
 
-## 
 
-$$
-\int_{a}^{b} x^2 dx
-$$
+## texas数据集
+| Model    | Layers | Performance     |
+|----------|--------|-----------------|
+| AERO-GNN | 1      | Accuracy: 0.8378|
+| AERO-GNN | 2      | Accuracy: 0.7838|
+| AERO-GNN | 4      | Accuracy: 0.7568|
+
