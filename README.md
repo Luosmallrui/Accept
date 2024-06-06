@@ -65,5 +65,4 @@ Baseline
 | computers | GDC       | 32     |             |
 | computers | GDC       | 64     |             |
 
-注：以上表格是模板，请根据具体实验结果填写性能表现（Performance）列。
 
