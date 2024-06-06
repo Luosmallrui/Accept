@@ -164,6 +164,8 @@ class Trainer(object):
 
             acc.append(self.test_accuracy)
             print("Trial {:} Test Accuracy: {:.4f}".format(self.exp, self.test_accuracy))
+            print(f"layer:{self.args.num_layers}")
+            print("epoch",self.args.exp_num)
 
         self.avg_acc = sum(acc)/len(acc)
         self.std_acc = torch.std(torch.tensor(acc)).item()
