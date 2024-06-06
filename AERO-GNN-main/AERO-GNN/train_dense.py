@@ -12,7 +12,7 @@ from utils import fixed_split, sparse_split, init_optimizer
 class Trainer(object):
 
     def __init__(self, args, graph):
-        
+        self.test_accuracy = 0
         self.args = args
         
         self.graph = graph

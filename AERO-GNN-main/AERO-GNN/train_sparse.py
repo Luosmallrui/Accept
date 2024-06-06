@@ -12,6 +12,7 @@ from utils import fixed_split, sparse_split, init_optimizer
 class Trainer(object):
 
     def __init__(self, args, graph):
+        self.test_accuracy = 0
         
         self.args = args
         
@@ -83,7 +84,7 @@ class Trainer(object):
             _, pred = logits.max(dim=1)
             correct = pred[index_set].eq(self.target[index_set]).sum().item()
             acc = correct / len(index_set)
-
+            self.test_accuracy = acc
             return acc, loss
 
         
@@ -161,8 +162,8 @@ class Trainer(object):
             self.data_split()
             self.transfer_to_gpu()
             self.train_neural_network()
-
-            acc.append(self.test_accuracy)
+            if self.test_accuracy!=None:
+                acc.append(self.test_accuracy)
             print("Trial {:} Test Accuracy: {:.4f}".format(self.exp, self.test_accuracy))
             print(f"layer:{self.args.num_layers}")
             print("epoch",self.args.exp_num)
