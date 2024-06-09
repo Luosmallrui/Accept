@@ -5,26 +5,28 @@ import torch
 import torch.nn.functional as F
 import pdb
 from tqdm import trange
+import os
+import csv
 
 from models import *
 from utils import fixed_split, sparse_split, init_optimizer
+
 
 class Trainer(object):
 
     def __init__(self, args, graph):
         self.test_accuracy = 0
         self.args = args
-        
+
         self.graph = graph
         self.target = self.graph.y
 
         self.device = torch.device(self.args.device)
         torch.cuda.set_device(self.device)
-        
+
         self.in_channels = self.graph.x.size(1)
         self.hid_channels = self.args.hid_dim
-        self.out_channels = int(torch.max(self.target).item() + 1) 
-           
+        self.out_channels = int(torch.max(self.target).item() + 1)
 
     def create_model(self):
 
@@ -34,12 +36,12 @@ class Trainer(object):
         if self.args.model == 'appnp': Model = APPNP_Model
 
         if self.args.model == 'gcn2': Model = GCNII_Model
-        if self.args.model == 'adgn' : Model = ADGN_Model
+        if self.args.model == 'adgn': Model = ADGN_Model
 
         if self.args.model == 'gat': Model = GAT_Model
         if self.args.model == 'gatv2': Model = GAT_v2_Model
         if self.args.model == 'gt': Model = GT_Model
-        if self.args.model == 'gat-res' : Model = GAT_v2_Res_Model
+        if self.args.model == 'gat-res': Model = GAT_v2_Res_Model
         if self.args.model == 'fagcn': Model = FAGCN_Model
 
         if self.args.model == 'gprgnn': Model = GPR_GNN_Model
@@ -47,12 +49,12 @@ class Trainer(object):
         if self.args.model == 'mixhop': Model = MixHop_Model
 
         self.model = Model(self.args,
-                            self.in_channels,
-                            self.hid_channels,
-                            self.out_channels,
-                            self.graph,
-                            )
-                
+                           self.in_channels,
+                           self.hid_channels,
+                           self.out_channels,
+                           self.graph,
+                           )
+
     def data_split(self):
 
         """
@@ -61,41 +63,37 @@ class Trainer(object):
         if self.args.split == 'fixed': split = fixed_split(self.args, self.graph, self.exp)
         if self.args.split == 'sparse': split = sparse_split(self.graph, 0.025, 0.025)
         self.train_nodes, self.validation_nodes, self.test_nodes = split
-        
 
     def transfer_to_gpu(self):
 
         if self.exp == 0: self.graph = self.graph.to(self.device)
         self.target = self.target.long().squeeze().to(self.device)
         self.model = self.model.to(self.device)
-        
-        
+
     def eval(self, index_set):
 
         self.model.eval()
-        
+
         with torch.no_grad():
-            
             prediction = self.model(self.graph.x, self.graph.edge_index)
             logits = F.log_softmax(prediction, dim=1)
             loss = F.nll_loss(logits[index_set], self.target[index_set])
-            
+
             _, pred = logits.max(dim=1)
             correct = pred[index_set].eq(self.target[index_set]).sum().item()
             acc = correct / len(index_set)
 
             return acc, loss
 
-        
     def do_a_step(self):
 
         self.model.train()
         self.optimizer.zero_grad()
-        prediction  = self.model(self.graph.x, self.graph.edge_index)
+        prediction = self.model(self.graph.x, self.graph.edge_index)
         prediction = F.log_softmax(prediction, dim=1)
         self.loss = F.nll_loss(prediction[self.train_nodes], self.target[self.train_nodes])
 
-        if self.args.lambd_l2 > 0: 
+        if self.args.lambd_l2 > 0:
             self.loss += sum([p.pow(2).sum() for p in self.model.parameters()]) * self.args.lambd_l2
 
         self.loss.backward()
@@ -109,17 +107,16 @@ class Trainer(object):
         self.step_counter = 0
         self.best_val_acc = 0
         self.best_val_loss = np.inf
-        
+
         for _ in self.iterator:
-            
+
             self.do_a_step()
 
             val_acc, val_loss = self.eval(self.validation_nodes)
             self.iterator.set_description("Validation accuracy: {:.4f}".format(val_acc))
-            
+
             close = self.acc_step_counter(val_acc)
             if close: break
-                
 
     def acc_step_counter(self, val_acc):
         if val_acc >= self.best_val_acc:
@@ -130,19 +127,17 @@ class Trainer(object):
 
         else:
             self.step_counter = self.step_counter + 1
-            if self.step_counter > self.args.early_stopping_rounds:    
-                self.iterator.close()                
+            if self.step_counter > self.args.early_stopping_rounds:
+                self.iterator.close()
                 return True
             return False
-            
-            
+
     def fit(self):
-        
+
         acc = []
         seeds = torch.load('./seeds_100.pt')
 
         for _ in range(self.args.exp_num):
-
             self.exp = _
             self.seed = seeds[_]
 
@@ -155,7 +150,7 @@ class Trainer(object):
 
             self.model = None
             self.optimizer = None
-            
+
             self.create_model()
             self.data_split()
             self.transfer_to_gpu()
@@ -163,14 +158,27 @@ class Trainer(object):
 
             acc.append(self.test_accuracy)
             print("Trial {:} Test Accuracy: {:.4f}".format(self.exp, self.test_accuracy))
-            print(f"layer:{self.args.num_layers}")
-            print("epoch",self.args.exp_num)
 
-        self.avg_acc = sum(acc)/len(acc)
+        self.avg_acc = sum(acc) / len(acc)
         self.std_acc = torch.std(torch.tensor(acc)).item()
-        
+        print(f"layer:{self.args.iterations}")
+        print("epoch", self.args.exp_num)
         print("Model: {}".format(self.args.model))
         print('n trials: {}'.format(self.args.exp_num))
         print('dataset: {}'.format(self.args.dataset))
         print("Mean test accuracy: {:.4f}".format(self.avg_acc), "±", '{:.3f}'.format(self.std_acc))
-
+        iterations = self.args.iterations
+        exp_num = self.args.exp_num
+        model = self.args.model
+        n_trials = self.args.exp_num
+        dataset = self.args.dataset
+        avg_acc = self.avg_acc
+        std_acc = self.std_acc
+        csv_file = '/root/workspace/res.csv'
+        file_exists = os.path.isfile(csv_file)
+        with open(csv_file, mode='a', newline='') as file:
+            writer = csv.writer(file)
+            if not file_exists:
+                writer.writerow(
+                    ['layer', 'epoch', 'Model', 'n trials', 'dataset', 'Mean test accuracy', 'std deviation'])
+            writer.writerow([iterations, exp_num, model, n_trials, dataset, f"{avg_acc:.4f}", f"{std_acc:.3f}"])
