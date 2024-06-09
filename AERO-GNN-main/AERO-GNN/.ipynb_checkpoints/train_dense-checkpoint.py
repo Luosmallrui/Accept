@@ -162,23 +162,23 @@ class Trainer(object):
         self.avg_acc = sum(acc) / len(acc)
         self.std_acc = torch.std(torch.tensor(acc)).item()
         print(f"layer:{self.args.iterations}")
-        print("epoch", self.args.exp_num)
+        print("epoch", self.args.epochs)
         print("Model: {}".format(self.args.model))
         print('n trials: {}'.format(self.args.exp_num))
         print('dataset: {}'.format(self.args.dataset))
         print("Mean test accuracy: {:.4f}".format(self.avg_acc), "±", '{:.3f}'.format(self.std_acc))
         iterations = self.args.iterations
-        exp_num = self.args.exp_num
+        epoch = self.args.epochs
         model = self.args.model
         n_trials = self.args.exp_num
         dataset = self.args.dataset
         avg_acc = self.avg_acc
         std_acc = self.std_acc
-        csv_file = '/root/workspace/res.csv'
+        csv_file = 'res.csv'
         file_exists = os.path.isfile(csv_file)
         with open(csv_file, mode='a', newline='') as file:
             writer = csv.writer(file)
             if not file_exists:
                 writer.writerow(
                     ['layer', 'epoch', 'Model', 'n trials', 'dataset', 'Mean test accuracy', 'std deviation'])
-            writer.writerow([iterations, exp_num, model, n_trials, dataset, f"{avg_acc:.4f}", f"{std_acc:.3f}"])
+            writer.writerow([iterations, epoch, model, n_trials, dataset, f"{avg_acc:.4f}", f"{std_acc:.3f}"])
