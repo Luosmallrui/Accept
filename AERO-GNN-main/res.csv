@@ -2,3 +2,4 @@ layer,epoch,Model,n trials,dataset,Mean test accuracy,std deviation,Mean Dirichl
 4,2000,gcn,50,wiki,0.7312,0.013,119.1959,35.833
 8,2000,gcn,50,wiki,0.6082,0.034,92.8894,53.397
 16,2000,gcn,50,wiki,0.2841,0.008,3.5670,1.076
+32,2000,gcn,50,wiki,0.2848,0.009,3.6489,1.250

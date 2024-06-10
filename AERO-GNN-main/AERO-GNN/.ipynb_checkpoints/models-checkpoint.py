@@ -537,7 +537,7 @@ class GAT_Model(nn.Module):
                             negative_slope=0.2,
                             dropout = self.args.dropout,
                             add_self_loops = False,
-                            share_weights = True,
+                            # share_weights = True,
                             )
                 )
 
@@ -547,7 +547,7 @@ class GAT_Model(nn.Module):
                             negative_slope=0.2,
                             dropout = self.args.dropout,
                             add_self_loops = False,
-                            share_weights = True,
+                            # share_weights = True,
                             )
 
         self.convs[-1] = GATConv(self.hid_channels * self.num_heads, self.out_channels,
@@ -556,7 +556,7 @@ class GAT_Model(nn.Module):
                             negative_slope=0.2,
                             dropout = self.args.dropout,
                             add_self_loops = False,
-                            share_weights = True,
+                            # share_weights = True,
                             )
 
         self.dropout = nn.Dropout(self.args.dropout)

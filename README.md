@@ -153,5 +153,5 @@ Downloading https://raw.githubusercontent.com/graphdml-uiuc-jlu/geom-gcn/f1fc0d1
 | 4     | 2000  | gcn   | 50     | wiki    | 0.7312   | 0.013         | 119.1959         |
 | 8     | 2000  | gcn   | 50     | wiki    | 0.6082   | 0.034         | 92.8894          |
 | 16    | 2000  | gcn   | 50     | wiki    | 0.2841   | 0.008         | 3.5670           |
-| 32    | 2000  | gcn   | 50     | wiki    |          |               |                  |
+| 32    | 2000  | gcn   | 50     | wiki    | 0.2848   | 0.009         | 3.6489           |
 | 64    | 2000  | gcn   | 50     | wiki    |          |               |                  |
