@@ -148,7 +148,7 @@ Downloading https://raw.githubusercontent.com/graphdml-uiuc-jlu/geom-gcn/f1fc0d1
 | 16    | 2000  | AERO  | 50     | wiki    | 0.7849   | 0.010         | None             |
 | 32    | 2000  | AERO  | 50     | wiki    | 0.7826   | 0.010         | None             |
 | 64    | 2000  | AERO  | 50     | wiki    | 0.7775   | 0.025         | None             |
-| 1     | 2000  | gcn   | 50     | wiki    | 0.7789   | 0.006         | None             |
+| 1     | 2000  | gcn   | 50     | wiki    | 0.7789   | 0.006         | 72.1631          |
 | 2     | 2000  | gcn   | 50     | wiki    | 0.7738   | 0.012         | None             |
 | 4     | 2000  | gcn   | 50     | wiki    | 0.7312   | 0.013         | 119.1959         |
 | 8     | 2000  | gcn   | 50     | wiki    | 0.6082   | 0.034         | 92.8894          |
