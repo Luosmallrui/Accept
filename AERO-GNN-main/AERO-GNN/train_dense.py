@@ -111,7 +111,7 @@ class Trainer(object):
             _, pred = logits.max(dim=1)
             correct = pred[index_set].eq(self.target[index_set]).sum().item()
             acc = correct / len(index_set)
-
+            X=X.view(prediction.size(0),-1)
             dirichlet_energy = self.compute_dirichlet_energy(X, self.graph.edge_index)
 
             return acc, loss, dirichlet_energy
