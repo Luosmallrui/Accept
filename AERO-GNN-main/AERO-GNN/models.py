@@ -382,7 +382,7 @@ class GCNII_Model(MessagePassing):
 
 class GCN_Model(MessagePassing):
 
-    def __init__(self, args, in_channels, hid_channels, out_channels, graph,):
+    def __init__(self, args, in_channels, hid_channels, out_channels, num_layers, graph):
         super().__init__()
 
         self.args = args
@@ -390,6 +390,7 @@ class GCN_Model(MessagePassing):
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.hid_channels = hid_channels
+        self.num_layers = num_layers
 
         self.num_nodes = graph.x.size(0)
 
@@ -400,30 +401,46 @@ class GCN_Model(MessagePassing):
 
         self.convs = nn.ModuleList()
 
-        self.convs.append(
-            GCNConv(self.in_channels, self.hid_channels, cached=True, normalize=True))
+        # Input layer: Linear layer
+        self.input_linear = nn.Linear(self.in_channels, self.hid_channels)
 
-        self.convs.append(
-            GCNConv(self.hid_channels, self.out_channels, cached=True, normalize=True))
+        # Hidden layers: GCN layers
+        for _ in range(self.num_layers):
+            self.convs.append(
+                GCNConv(self.hid_channels, self.hid_channels, cached=True, normalize=True))
+
+        # Output layer: Linear layer
+        self.output_linear = nn.Linear(self.hid_channels, self.out_channels)
 
         self.dropout = nn.Dropout(self.args.dropout)
         self.relu = F.relu
 
     def reset_parameters(self):
-        for conv in self.convs: conv.reset_parameters()
+        self.input_linear.reset_parameters()
+        for conv in self.convs:
+            conv.reset_parameters()
+        self.output_linear.reset_parameters()
 
     def forward(self, x, edge_index):
-        
+
         x = self.dropout(x)
 
-        for i, conv in enumerate(self.convs[:-1]):
+        # Input layer
+        x = self.input_linear(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+
+        # Hidden layers
+        for conv in self.convs:
             x = conv(x, edge_index)
             x = self.relu(x)
             x = self.dropout(x)
-        
-        x = self.convs[-1](x, edge_index)
+
+        # Output layer
+        x = self.output_linear(x)
 
         return x
+
 
 class GAT_v2_Model(nn.Module):
     
