@@ -11,7 +11,6 @@ import csv
 from models import *
 from utils import fixed_split, sparse_split, init_optimizer
 
-
 class Trainer(object):
 
     def __init__(self, args, graph):
@@ -70,6 +69,38 @@ class Trainer(object):
         self.target = self.target.long().squeeze().to(self.device)
         self.model = self.model.to(self.device)
 
+    def compute_dirichlet_energy(self, x, edge_index):
+        """
+        计算 Dirichlet 能量
+
+        参数:
+        x: 节点特征矩阵 (num_nodes, num_features)
+        edge_index: 图的边索引 (2, num_edges)
+
+        返回:
+        dirichlet_energy: Dirichlet 能量
+        """
+        num_nodes = x.size(0)
+
+        # 获取节点的度
+        row, col = edge_index
+        deg = torch.bincount(row)
+        
+        # 确保度的维度匹配特征矩阵
+        deg = deg.float().unsqueeze(1)
+
+        # 计算归一化后的特征
+        x_norm = x / torch.sqrt(1 + deg)  # 加上1防止度为零
+
+        # 计算特征差的平方和
+        diff = x_norm[row] - x_norm[col]
+        diff_squared_sum = torch.sum(diff**2, dim=1)
+        
+        # 计算 Dirichlet 能量
+        dirichlet_energy = torch.sum(diff_squared_sum).item() / num_nodes
+        
+        return dirichlet_energy
+
     def eval(self, index_set):
 
         self.model.eval()
@@ -83,7 +114,9 @@ class Trainer(object):
             correct = pred[index_set].eq(self.target[index_set]).sum().item()
             acc = correct / len(index_set)
 
-            return acc, loss
+            dirichlet_energy = self.compute_dirichlet_energy(prediction, self.graph.edge_index)
+
+            return acc, loss, dirichlet_energy
 
     def do_a_step(self):
 
@@ -112,7 +145,7 @@ class Trainer(object):
 
             self.do_a_step()
 
-            val_acc, val_loss = self.eval(self.validation_nodes)
+            val_acc, val_loss, val_dirichlet_energy = self.eval(self.validation_nodes)
             self.iterator.set_description("Validation accuracy: {:.4f}".format(val_acc))
 
             close = self.acc_step_counter(val_acc)
@@ -121,7 +154,7 @@ class Trainer(object):
     def acc_step_counter(self, val_acc):
         if val_acc >= self.best_val_acc:
             self.best_val_acc = val_acc
-            self.test_accuracy, _ = self.eval(self.test_nodes)
+            self.test_accuracy, _, self.test_dirichlet_energy = self.eval(self.test_nodes)
             self.step_counter = 0
             return False
 
@@ -135,6 +168,7 @@ class Trainer(object):
     def fit(self):
 
         acc = []
+        dirichlet_energies = []
         seeds = torch.load('./seeds_100.pt')
 
         for _ in range(self.args.exp_num):
@@ -157,16 +191,22 @@ class Trainer(object):
             self.train_neural_network()
 
             acc.append(self.test_accuracy)
-            print("Trial {:} Test Accuracy: {:.4f}".format(self.exp, self.test_accuracy))
+            dirichlet_energies.append(self.test_dirichlet_energy)
+            print("Trial {:} Test Accuracy: {:.4f}, Dirichlet Energy: {:.4f}".format(self.exp, self.test_accuracy, self.test_dirichlet_energy))
 
         self.avg_acc = sum(acc) / len(acc)
         self.std_acc = torch.std(torch.tensor(acc)).item()
+        self.avg_dirichlet_energy = sum(dirichlet_energies) / len(dirichlet_energies)
+        self.std_dirichlet_energy = torch.std(torch.tensor(dirichlet_energies)).item()
+
         print(f"layer:{self.args.num_layers}")
         print("epoch", self.args.epochs)
         print("Model: {}".format(self.args.model))
         print('n trials: {}'.format(self.args.exp_num))
         print('dataset: {}'.format(self.args.dataset))
         print("Mean test accuracy: {:.4f}".format(self.avg_acc), "±", '{:.3f}'.format(self.std_acc))
+        print("Mean Dirichlet energy: {:.4f}".format(self.avg_dirichlet_energy), "±", '{:.3f}'.format(self.std_dirichlet_energy))
+
         iterations = self.args.num_layers
         epoch = self.args.epochs
         model = self.args.model
@@ -174,11 +214,15 @@ class Trainer(object):
         dataset = self.args.dataset
         avg_acc = self.avg_acc
         std_acc = self.std_acc
+        avg_dirichlet_energy = self.avg_dirichlet_energy
+        std_dirichlet_energy = self.std_dirichlet_energy
+
         csv_file = 'res.csv'
         file_exists = os.path.isfile(csv_file)
         with open(csv_file, mode='a', newline='') as file:
             writer = csv.writer(file)
             if not file_exists:
                 writer.writerow(
-                    ['layer', 'epoch', 'Model', 'n trials', 'dataset', 'Mean test accuracy', 'std deviation'])
-            writer.writerow([iterations, epoch, model, n_trials, dataset, f"{avg_acc:.4f}", f"{std_acc:.3f}"])
+                    ['layer', 'epoch', 'Model', 'n trials', 'dataset', 'Mean test accuracy', 'std deviation', 'Mean Dirichlet energy', 'std Dirichlet energy'])
+            writer.writerow([iterations, epoch, model, n_trials, dataset, f"{avg_acc:.4f}", f"{std_acc:.3f}", f"{avg_dirichlet_energy:.4f}", f"{std_dirichlet_energy:.3f}"])
+
