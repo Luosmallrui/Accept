@@ -95,7 +95,7 @@ class Trainer(object):
         diff = X_norm[edge_index[0]] - X_norm[edge_index[1]]
 
         #l2 norm
-        dirichlet_energy =torch.norm(diff, p=2, dim=1)/ num_nodes
+        dirichlet_energy =torch.norm(diff, p=2, dim=-1)/ num_nodes
         return dirichlet_energy / 2
 
     def eval(self, index_set):
