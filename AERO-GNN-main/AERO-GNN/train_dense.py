@@ -104,7 +104,7 @@ class Trainer(object):
         self.model.eval()
 
         with torch.no_grad():
-            prediction = self.model(self.graph.x, self.graph.edge_index)
+            X,prediction = self.model(self.graph.x, self.graph.edge_index)
             logits = F.log_softmax(prediction, dim=1)
             loss = F.nll_loss(logits[index_set], self.target[index_set])
 
@@ -112,7 +112,7 @@ class Trainer(object):
             correct = pred[index_set].eq(self.target[index_set]).sum().item()
             acc = correct / len(index_set)
 
-            dirichlet_energy = self.compute_dirichlet_energy(prediction, self.graph.edge_index)
+            dirichlet_energy = self.compute_dirichlet_energy(X, self.graph.edge_index)
 
             return acc, loss, dirichlet_energy
 
@@ -120,7 +120,7 @@ class Trainer(object):
 
         self.model.train()
         self.optimizer.zero_grad()
-        prediction = self.model(self.graph.x, self.graph.edge_index)
+        _,prediction = self.model(self.graph.x, self.graph.edge_index)
         prediction = F.log_softmax(prediction, dim=1)
         self.loss = F.nll_loss(prediction[self.train_nodes], self.target[self.train_nodes])
 
