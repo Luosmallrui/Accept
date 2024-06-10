@@ -112,20 +112,20 @@ class AERO_GNN_Model(MessagePassing):
     def node_classifier(self, z):
         
         z = z.view(-1, self.heads * self.hid_channels)
-        z = self.elu(z)
-        if self.args.add_dropout == True: z = self.dropout(z)
-        z = self.dense_lins[-1](z)
+        z1 = self.elu(z)
+        if self.args.add_dropout == True: z1 = self.dropout(z1)
+        z1 = self.dense_lins[-1](z1)
         
-        return z
+        return z,z1
 
 
     def forward(self, x, edge_index):
         
         h0 = self.hid_feat_init(x)
         z_k_max = self.aero_propagate(h0, edge_index)
-        z_star =  self.node_classifier(z_k_max)
+        z,z_star =  self.node_classifier(z_k_max)
 
-        return z_star
+        return z,z_star
 
 
     def hop_att_pred(self, h, z_scale):
@@ -178,7 +178,7 @@ class APPNP_Model(MessagePassing):
 
         self.num_nodes = graph.x.size(0)
 
-        self.K = self.args.iterations
+        self.K = self.args.iterations#这个也是通过iterations修改层数
         self.alpha = self.args.alpha
         
         self.setup_layers()
@@ -234,7 +234,7 @@ class APPNP_Model(MessagePassing):
         edge_index, a = gcn_norm(edge_index, num_nodes = self.num_nodes, add_self_loops=False)
         z = self.ppr_propagate(a, h, edge_index)
 
-        return z
+        return z,z
 
     def message(self, x_j: Tensor, edge_weight: OptTensor) -> Tensor:
         return x_j * edge_weight.view(-1, 1)
@@ -255,7 +255,7 @@ class GPR_GNN_Model(MessagePassing):
 
         self.num_nodes = graph.x.size(0)
 
-        self.K = self.args.iterations
+        self.K = self.args.iterations#这个也是通过iterations修改层数
         self.alpha = self.args.alpha
 
         TEMP = self.alpha*(1-self.alpha)**np.arange(self.K+1)
@@ -315,7 +315,7 @@ class GPR_GNN_Model(MessagePassing):
         edge_idx, a = gcn_norm(edge_idx, num_nodes = self.num_nodes, add_self_loops=False)
         z = self.gpr_propagate(a, h, edge_idx)
         
-        return z
+        return z,z
 
     def message(self, x_j, norm):
         return x_j * norm.view(-1, 1)
@@ -339,7 +339,7 @@ class GCNII_Model(MessagePassing):
     def setup_hyperparameters(self):
         self.alpha = self.args.alpha
         self.theta = self.args.lambd
-        self.num_layer = self.args.num_layers
+        self.num_layer = self.args.num_layers#这个也是通过num_layers修改层数
 
     def setup_layers(self):
 
@@ -375,10 +375,13 @@ class GCNII_Model(MessagePassing):
             x = conv(x, x_0, edge_index, edge_weight)
             x = x.relu()
 
-        if self.args.add_dropout: x = self.dropout(x)
-        x = self.lins[1](x)
+        if self.args.add_dropout: 
+            x1 = self.dropout(x) 
+        else:
+            x1 = x
+        x1 = self.lins[1](x1)
 
-        return x
+        return x,x1
 
 class GCN_Model(MessagePassing):
 
@@ -437,9 +440,9 @@ class GCN_Model(MessagePassing):
             x = self.dropout(x)
 
         # Output layer
-        x = self.output_linear(x)
+        x1 = self.output_linear(x)
 
-        return x
+        return x,x1
 
 
 class GAT_v2_Model(nn.Module):
@@ -460,7 +463,7 @@ class GAT_v2_Model(nn.Module):
     def setup_layers(self):
 
         self.convs = nn.ModuleList()
-        for i in range(self.args.num_layers):
+        for i in range(self.args.num_layers):#通过num_layers修改
             self.convs.append(
                 GATv2_Conv(self.hid_channels * self.num_heads, self.hid_channels,
                             heads = self.num_heads,
@@ -507,67 +510,77 @@ class GAT_v2_Model(nn.Module):
             x = self.elu(x)
             x = self.dropout(x)
 
-        x, alpha_unnorm, alpha_norm, x_lin = self.convs[-1](x, edge_index, return_attention_weights = True)
+        x1, alpha_unnorm, alpha_norm, x_lin = self.convs[-1](x, edge_index, return_attention_weights = True)
                 
-        return x
+        return x,x1
 
         
 class GAT_Model(nn.Module):
-
-    def __init__(self, args, in_channels, hid_channels, out_channels, graph):
+    
+    def __init__(self, args, in_channels, hid_channels, out_channels, graph,):
         super(GAT_Model, self).__init__()
         self.args = args
 
         self.in_channels = in_channels
-        self.hid_channels = hid_channels
         self.out_channels = out_channels
+        self.hid_channels = hid_channels
 
         self.num_heads = self.args.num_heads
 
         self.setup_layers()
         self.reset_parameters()
-
+        
     def setup_layers(self):
 
-        # Linear layer to adjust input dimension
-        self.input_linear = nn.Linear(self.in_channels, self.hid_channels)
-
         self.convs = nn.ModuleList()
-        for _ in range(self.args.num_layers ):
-            self.convs.append(GATConv(self.hid_channels * self.num_heads, self.hid_channels,
-                                      heads=self.num_heads, concat=True, negative_slope=0.2,
-                                      dropout=self.args.dropout, add_self_loops=False))
+        for i in range(self.args.num_layers):#num_layers
+            self.convs.append(
+                GATConv(self.hid_channels * self.num_heads, self.hid_channels,
+                            heads = self.num_heads,
+                            concat = True,
+                            negative_slope=0.2,
+                            dropout = self.args.dropout,
+                            add_self_loops = False,
+                            share_weights = True,
+                            )
+                )
 
-        self.convs.append(GATConv(self.hid_channels * self.num_heads, self.out_channels,
-                                  heads=1, concat=False, negative_slope=0.2,
-                                  dropout=self.args.dropout, add_self_loops=False))
+        self.convs[0] = GATConv(self.in_channels, self.hid_channels,
+                            heads = self.num_heads,
+                            concat = True,
+                            negative_slope=0.2,
+                            dropout = self.args.dropout,
+                            add_self_loops = False,
+                            share_weights = True,
+                            )
 
-        # Linear layer to adjust output dimension
-        self.output_linear = nn.Linear(self.out_channels, self.out_channels)
+        self.convs[-1] = GATConv(self.hid_channels * self.num_heads, self.out_channels,
+                            heads = self.num_heads,
+                            concat = False,
+                            negative_slope=0.2,
+                            dropout = self.args.dropout,
+                            add_self_loops = False,
+                            share_weights = True,
+                            )
 
         self.dropout = nn.Dropout(self.args.dropout)
         self.elu = F.elu
 
     def reset_parameters(self):
-        self.input_linear.reset_parameters()
         for conv in self.convs:
             conv.reset_parameters()
-        self.output_linear.reset_parameters()
 
     def forward(self, x, edge_index):
-
+        
         x = self.dropout(x)
-        x = self.elu(self.input_linear(x))
-
-        for conv in self.convs[:-1]:
-            x = conv(x, edge_index)
+        for i in range(self.args.num_layers - 1):
+            x = self.convs[i](x, edge_index)
             x = self.elu(x)
             x = self.dropout(x)
+        x1 = self.convs[-1](x, edge_index)
 
-        x = self.convs[-1](x, edge_index)
-        x = self.output_linear(x)
+        return x,x1
 
-        return x
 
 class GAT_v2_Res_Model(nn.Module):
     
@@ -635,9 +648,9 @@ class GAT_v2_Res_Model(nn.Module):
             x = x * (1 - self.alpha)  +  x0 * self.alpha            
             x = self.elu(x)
             x = self.dropout(x)
-        x, alpha_unnorm, alpha_norm, x_lin = self.convs[-1](x, edge_index, return_attention_weights = True)
+        x1, alpha_unnorm, alpha_norm, x_lin = self.convs[-1](x, edge_index, return_attention_weights = True)
         
-        return x
+        return x,x1
 
 class DAGNN_Model(MessagePassing):
 
@@ -652,7 +665,7 @@ class DAGNN_Model(MessagePassing):
 
         self.num_nodes = graph.x.size(0)
 
-        self.K = self.args.iterations
+        self.K = self.args.iterations#通过iterations控制
         
         self.setup_layers()
         self.reset_parameters()
@@ -689,11 +702,11 @@ class DAGNN_Model(MessagePassing):
 
         x = F.dropout(x, p=self.args.dropout, training=self.training)
         x = F.relu(self.lin1(x))
-        x = F.dropout(x, p=self.args.dropout, training=self.training)
-        x = self.lin2(x)
-        x = self.prop(x, edge_index)
+        x1 = F.dropout(x, p=self.args.dropout, training=self.training)
+        x1 = self.lin2(x1)
+        x1 = self.prop(x1, edge_index)
         
-        return x
+        return x,x1
 
     def message(self, x_j, norm):
         return norm.view(-1, 1) * x_j
@@ -714,7 +727,7 @@ class FAGCN_Model(MessagePassing):
 
         self.num_nodes = graph.x.size(0)
 
-        self.K = self.args.iterations
+        self.K = self.args.iterations#通过iterations控制
         self.eps = self.args.alpha
         
         self.setup_layers()
@@ -756,11 +769,11 @@ class FAGCN_Model(MessagePassing):
         x_0 = x
         for i in range(self.K):
             x, alpha_unnorm, alpha_norm = self.convs[i](x, x_0, edge_index)        
-        x = self.lin2(x)
+        x1 = self.lin2(x)
     
-        return x
+        return x,x1
 
-class GT_Model(nn.Module):
+class GT_Model(nn.Module):#通过num_layers控制
     def __init__(self, args, in_channels, hid_channels, out_channels, graph,):
         super(GT_Model, self).__init__()
         self.args = args
@@ -819,11 +832,11 @@ class GT_Model(nn.Module):
             x = self.elu(x)
             x = self.dropout(x)
 
-        x = self.convs[-1](x, edge_index)
+        x1 = self.convs[-1](x, edge_index)
 
-        return x
+        return x,x1
 
-class MixHop_Model(nn.Module):
+class MixHop_Model(nn.Module):#通过num_layers控制
     """ 
     implemetation of MixHop from https://github.com/CUAI/Non-Homophily-Large-Scale/blob/master/models.py with minor changes
     some assumptions: the powers of the adjacency are [0, 1, ..., hops],
@@ -837,7 +850,7 @@ class MixHop_Model(nn.Module):
 
         self.args = args
         
-        num_layers = 2
+        num_layers =self.args.num_layers
         hops = self.args.iterations
 
         self.convs = nn.ModuleList()
@@ -881,12 +894,12 @@ class MixHop_Model(nn.Module):
             x = conv(x, adj_t)
             x = self.activation(x)
             x = F.dropout(x, p=self.dropout, training=self.training)
-        x = self.convs[-1](x, adj_t)
+        x1 = self.convs[-1](x, adj_t)
 
-        x = self.final_project(x)
-        return x
+        x1 = self.final_project(x1)
+        return x,x1
 
-class ADGN_Model(MessagePassing):
+class ADGN_Model(MessagePassing):#通过iterations控制
     
     def __init__(self, args, in_channels, hid_channels, out_channels, graph,):
         super().__init__()
@@ -932,6 +945,6 @@ class ADGN_Model(MessagePassing):
         x = self.conv(x, edge_index)
         x = self.dropout(x)
 
-        return x
+        return x,x
 
 

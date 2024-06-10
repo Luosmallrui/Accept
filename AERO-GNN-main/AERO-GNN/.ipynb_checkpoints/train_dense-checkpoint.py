@@ -69,52 +69,50 @@ class Trainer(object):
         self.target = self.target.long().squeeze().to(self.device)
         self.model = self.model.to(self.device)
 
-    def compute_dirichlet_energy(self, x, edge_index):
-        """
-        计算 Dirichlet 能量
-
-        参数:
-        x: 节点特征矩阵 (num_nodes, num_features)
-        edge_index: 图的边索引 (2, num_edges)
-
-        返回:
-        dirichlet_energy: Dirichlet 能量
-        """
-        num_nodes = x.size(0)
-
-        # 获取节点的度
-        row, col = edge_index
-        deg = torch.bincount(row)
+    def calculate_dirichlet_energy(self,X, edge_index):
+    """
+    Calculate the Dirichlet energy for a given feature matrix X and edge index.
+    
+    Parameters:
+    X (torch.Tensor): Feature matrix of shape (num_nodes, num_features)
+    edge_index (torch.Tensor): Edge index matrix of shape (2, num_edges)
+    
+    Returns:
+    torch.Tensor: Dirichlet energy
+    """
+        num_nodes = X.size(0)
         
-        # 确保度的维度匹配特征矩阵
-        deg = deg.float().unsqueeze(1)
-
-        # 计算归一化后的特征
-        x_norm = x / torch.sqrt(1 + deg)  # 加上1防止度为零
-
-        # 计算特征差的平方和
-        diff = x_norm[row] - x_norm[col]
-        diff_squared_sum = torch.sum(diff**2, dim=1)
+        # Calculate node degrees
+        degrees = torch.zeros(num_nodes, dtype=X.dtype, device=X.device)
+        degrees.scatter_add_(0, edge_index[0], torch.ones(edge_index.size(1), dtype=X.dtype, device=X.device))
         
-        # 计算 Dirichlet 能量
-        dirichlet_energy = torch.sum(diff_squared_sum).item() / num_nodes
+        # Normalize features by sqrt(1 + degrees)
+        norm_factors = torch.sqrt(1 + degrees).unsqueeze(1)
+        X_norm = X / norm_factors
         
-        return dirichlet_energy
+        # Compute differences between connected nodes
+        diff = X_norm[edge_index[0]] - X_norm[edge_index[1]]
+        
+        # Calculate Dirichlet energy
+        dirichlet_energy = torch.sum(diff.pow(2)) / num_nodes
+        
+        return dirichlet_energy/2
+
 
     def eval(self, index_set):
 
         self.model.eval()
 
         with torch.no_grad():
-            prediction = self.model(self.graph.x, self.graph.edge_index)
+            X,prediction = self.model(self.graph.x, self.graph.edge_index)
             logits = F.log_softmax(prediction, dim=1)
             loss = F.nll_loss(logits[index_set], self.target[index_set])
 
             _, pred = logits.max(dim=1)
             correct = pred[index_set].eq(self.target[index_set]).sum().item()
             acc = correct / len(index_set)
-
-            dirichlet_energy = self.compute_dirichlet_energy(prediction, self.graph.edge_index)
+            X=X.view(prediction.size(0),-1)
+            dirichlet_energy = self.compute_dirichlet_energy(X, self.graph.edge_index)
 
             return acc, loss, dirichlet_energy
 
@@ -122,7 +120,7 @@ class Trainer(object):
 
         self.model.train()
         self.optimizer.zero_grad()
-        prediction = self.model(self.graph.x, self.graph.edge_index)
+        _,prediction = self.model(self.graph.x, self.graph.edge_index)
         prediction = F.log_softmax(prediction, dim=1)
         self.loss = F.nll_loss(prediction[self.train_nodes], self.target[self.train_nodes])
 
@@ -217,7 +215,7 @@ class Trainer(object):
         avg_dirichlet_energy = self.avg_dirichlet_energy
         std_dirichlet_energy = self.std_dirichlet_energy
 
-        csv_file = 'res.csv'
+        csv_file = f'{self.args.model}.csv'
         file_exists = os.path.isfile(csv_file)
         with open(csv_file, mode='a', newline='') as file:
             writer = csv.writer(file)

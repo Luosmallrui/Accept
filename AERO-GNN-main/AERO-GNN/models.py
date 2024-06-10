@@ -375,7 +375,10 @@ class GCNII_Model(MessagePassing):
             x = conv(x, x_0, edge_index, edge_weight)
             x = x.relu()
 
-        if self.args.add_dropout: x1 = self.dropout(x) else:x1 = x
+        if self.args.add_dropout: 
+            x1 = self.dropout(x) 
+        else:
+            x1 = x
         x1 = self.lins[1](x1)
 
         return x,x1

@@ -215,7 +215,7 @@ class Trainer(object):
         avg_dirichlet_energy = self.avg_dirichlet_energy
         std_dirichlet_energy = self.std_dirichlet_energy
 
-        csv_file = 'res.csv'
+        csv_file = f'{self.args.model}.csv'
         file_exists = os.path.isfile(csv_file)
         with open(csv_file, mode='a', newline='') as file:
             writer = csv.writer(file)
