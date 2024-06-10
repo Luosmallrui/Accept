@@ -68,7 +68,7 @@ class Trainer(object):
         self.target = self.target.long().squeeze().to(self.device)
         self.model = self.model.to(self.device)
 
-    def calculate_dirichlet_energy(self, X, edge_index):
+    def compute_dirichlet_energy(self, X, edge_index):
         """
     Calculate the Dirichlet energy for a given feature matrix X and edge index.
 
@@ -92,11 +92,10 @@ class Trainer(object):
         # Compute differences between connected nodes
         diff = X_norm[edge_index[0]] - X_norm[edge_index[1]]
 
-        # Calculate Dirichlet energy
-        dirichlet_energy = torch.sum(diff.pow(2)) / num_nodes
-
+        #l2 norm
+        dirichlet_energy =torch.norm(diff, p=2, dim=-1)/ num_nodes
         return dirichlet_energy / 2
-
+    
     def eval(self, index_set):
 
         self.model.eval()
