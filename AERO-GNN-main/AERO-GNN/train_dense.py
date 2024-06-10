@@ -11,6 +11,7 @@ import csv
 from models import *
 from utils import fixed_split, sparse_split, init_optimizer
 
+
 class Trainer(object):
 
     def __init__(self, args, graph):
@@ -69,49 +70,48 @@ class Trainer(object):
         self.target = self.target.long().squeeze().to(self.device)
         self.model = self.model.to(self.device)
 
-    def calculate_dirichlet_energy(self,X, edge_index):
-    """
+    def calculate_dirichlet_energy(self, X, edge_index):
+        """
     Calculate the Dirichlet energy for a given feature matrix X and edge index.
-    
+
     Parameters:
     X (torch.Tensor): Feature matrix of shape (num_nodes, num_features)
     edge_index (torch.Tensor): Edge index matrix of shape (2, num_edges)
-    
+
     Returns:
     torch.Tensor: Dirichlet energy
-    """
+        """
         num_nodes = X.size(0)
-        
+
         # Calculate node degrees
         degrees = torch.zeros(num_nodes, dtype=X.dtype, device=X.device)
         degrees.scatter_add_(0, edge_index[0], torch.ones(edge_index.size(1), dtype=X.dtype, device=X.device))
-        
+
         # Normalize features by sqrt(1 + degrees)
         norm_factors = torch.sqrt(1 + degrees).unsqueeze(1)
         X_norm = X / norm_factors
-        
+
         # Compute differences between connected nodes
         diff = X_norm[edge_index[0]] - X_norm[edge_index[1]]
-        
+
         # Calculate Dirichlet energy
         dirichlet_energy = torch.sum(diff.pow(2)) / num_nodes
-        
-        return dirichlet_energy/2
 
+        return dirichlet_energy / 2
 
     def eval(self, index_set):
 
         self.model.eval()
 
         with torch.no_grad():
-            X,prediction = self.model(self.graph.x, self.graph.edge_index)
+            X, prediction = self.model(self.graph.x, self.graph.edge_index)
             logits = F.log_softmax(prediction, dim=1)
             loss = F.nll_loss(logits[index_set], self.target[index_set])
 
             _, pred = logits.max(dim=1)
             correct = pred[index_set].eq(self.target[index_set]).sum().item()
             acc = correct / len(index_set)
-            X=X.view(prediction.size(0),-1)
+            X = X.view(prediction.size(0), -1)
             dirichlet_energy = self.compute_dirichlet_energy(X, self.graph.edge_index)
 
             return acc, loss, dirichlet_energy
@@ -120,7 +120,7 @@ class Trainer(object):
 
         self.model.train()
         self.optimizer.zero_grad()
-        _,prediction = self.model(self.graph.x, self.graph.edge_index)
+        _, prediction = self.model(self.graph.x, self.graph.edge_index)
         prediction = F.log_softmax(prediction, dim=1)
         self.loss = F.nll_loss(prediction[self.train_nodes], self.target[self.train_nodes])
 
@@ -190,7 +190,8 @@ class Trainer(object):
 
             acc.append(self.test_accuracy)
             dirichlet_energies.append(self.test_dirichlet_energy)
-            print("Trial {:} Test Accuracy: {:.4f}, Dirichlet Energy: {:.4f}".format(self.exp, self.test_accuracy, self.test_dirichlet_energy))
+            print("Trial {:} Test Accuracy: {:.4f}, Dirichlet Energy: {:.4f}".format(self.exp, self.test_accuracy,
+                                                                                     self.test_dirichlet_energy))
 
         self.avg_acc = sum(acc) / len(acc)
         self.std_acc = torch.std(torch.tensor(acc)).item()
@@ -203,9 +204,10 @@ class Trainer(object):
         print('n trials: {}'.format(self.args.exp_num))
         print('dataset: {}'.format(self.args.dataset))
         print("Mean test accuracy: {:.4f}".format(self.avg_acc), "±", '{:.3f}'.format(self.std_acc))
-        print("Mean Dirichlet energy: {:.4f}".format(self.avg_dirichlet_energy), "±", '{:.3f}'.format(self.std_dirichlet_energy))
+        print("Mean Dirichlet energy: {:.4f}".format(self.avg_dirichlet_energy), "±",
+              '{:.3f}'.format(self.std_dirichlet_energy))
 
-        iterations = self.args.num_layers
+        iterations = self.args.iterations
         epoch = self.args.epochs
         model = self.args.model
         n_trials = self.args.exp_num
@@ -221,6 +223,7 @@ class Trainer(object):
             writer = csv.writer(file)
             if not file_exists:
                 writer.writerow(
-                    ['layer', 'epoch', 'Model', 'n trials', 'dataset', 'Mean test accuracy', 'std deviation', 'Mean Dirichlet energy', 'std Dirichlet energy'])
-            writer.writerow([iterations, epoch, model, n_trials, dataset, f"{avg_acc:.4f}", f"{std_acc:.3f}", f"{avg_dirichlet_energy:.4f}", f"{std_dirichlet_energy:.3f}"])
-
+                    ['layer', 'epoch', 'Model', 'n trials', 'dataset', 'Mean test accuracy', 'std deviation',
+                     'Mean Dirichlet energy', 'std Dirichlet energy'])
+            writer.writerow([iterations, epoch, model, n_trials, dataset, f"{avg_acc:.4f}", f"{std_acc:.3f}",
+                             f"{avg_dirichlet_energy:.4f}", f"{std_dirichlet_energy:.3f}"])
