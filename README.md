@@ -128,13 +128,9 @@ Downloading https://raw.githubusercontent.com/graphdml-uiuc-jlu/geom-gcn/f1fc0d1
 
 ## cora数据集
 
-```bash
-python3 ./AERO-GNN/main.py --model aero  --iterations 32 --dr 0.0001 --dr-prop 0.0001 --dropout 0.7 --add-dropout 0 --lambd 1.0 --num-layers 8 --dataset cora
-```
 
 | Layer | Epoch | Model | Trials | Dataset | Performance              |
 |-------|-------|-------|--------|---------|--------------------------|
-| 1     | 2000  | AERO  | 50     | cora    | Accuracy: 0.7496 ± 0.010 |
 | 1     | 2000  | AERO  | 50     | cora    | Accuracy: 0.7496 ± 0.010 |
 | 2     | 2000  | AERO  | 50     | cora    | Accuracy: 0.7810 ± 0.011 |
 | 4     | 2000  | AERO  | 50     | cora    | Accuracy: 0.8019 ± 0.011 |
@@ -142,12 +138,16 @@ python3 ./AERO-GNN/main.py --model aero  --iterations 32 --dr 0.0001 --dr-prop 0
 | 16    | 2000  | AERO  | 50     | cora    | Accuracy: 0.8234 ± 0.008 |
 | 32    | 2000  | AERO  | 50     | cora    | Accuracy: 0.8176 ± 0.010 |
 | 64    | 2000  | AERO  | 50     | cora    | Accuracy: 0.8133 ± 0.010 |
+| 1     | 2000  | gcn   | 50     | cora    | Accuracy: 0.8264 ± 0.004 |
+| 2     | 2000  | gcn   | 50     | cora    | Accuracy: 0.8264 ± 0.004 |
+| 4     | 2000  | gcn   | 50     | cora    | Accuracy: 0.8264 ± 0.004 |
+| 8     | 2000  | gcn   | 50     | cora    | Accuracy: 0.8264 ± 0.004 |
+| 16    | 2000  | gcn   | 50     | cora    | Accuracy: 0.8264 ± 0.004 |
+| 32    | 2000  | gcn   | 50     | cora    | Accuracy: 0.8264 ± 0.004 |
+| 64    | 2000  | gcn   | 50     | cora    | Accuracy: 0.8264 ± 0.004 |
 
 ## wiki数据集
 
-```bash
-python3 ./AERO-GNN/main.py --model aero  --iterations 32 --dr 0.0001 --dr-prop 0.0001 --dropout 0.7 --add-dropout 0 --lambd 1.0 --num-layers 8 --dataset wiki
-```
 
 | Layer | Epoch | Model | Trials | Dataset | Performance              |
 |-------|-------|-------|--------|---------|--------------------------|
@@ -158,5 +158,12 @@ python3 ./AERO-GNN/main.py --model aero  --iterations 32 --dr 0.0001 --dr-prop 0
 | 16    | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7849 ± 0.010 |
 | 32    | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7826 ± 0.010 |
 | 64    | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7775 ± 0.025 |
+| 1     | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.004 |
+| 2     | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.004 |
+| 4     | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.004 |
+| 8     | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.004 |
+| 16    | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.004 |
+| 32    | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.004 |
+| 64    | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.004 |
 
 

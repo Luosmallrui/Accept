@@ -165,7 +165,7 @@ class Trainer(object):
         print('n trials: {}'.format(self.args.exp_num))
         print('dataset: {}'.format(self.args.dataset))
         print("Mean test accuracy: {:.4f}".format(self.avg_acc), "±", '{:.3f}'.format(self.std_acc))
-        iterations = self.args.iterations
+        iterations = self.args.num_layers
         epoch = self.args.epochs
         model = self.args.model
         n_trials = self.args.exp_num
