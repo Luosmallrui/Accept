@@ -69,37 +69,35 @@ class Trainer(object):
         self.target = self.target.long().squeeze().to(self.device)
         self.model = self.model.to(self.device)
 
-    def compute_dirichlet_energy(self, x, edge_index):
-        """
-        计算 Dirichlet 能量
-
-        参数:
-        x: 节点特征矩阵 (num_nodes, num_features)
-        edge_index: 图的边索引 (2, num_edges)
-
-        返回:
-        dirichlet_energy: Dirichlet 能量
-        """
-        num_nodes = x.size(0)
-
-        # 获取节点的度
-        row, col = edge_index
-        deg = torch.bincount(row)
+    def calculate_dirichlet_energy(X, edge_index):
+    """
+    Calculate the Dirichlet energy for a given feature matrix X and edge index.
+    
+    Parameters:
+    X (torch.Tensor): Feature matrix of shape (num_nodes, num_features)
+    edge_index (torch.Tensor): Edge index matrix of shape (2, num_edges)
+    
+    Returns:
+    torch.Tensor: Dirichlet energy
+    """
+        num_nodes = X.size(0)
         
-        # 确保度的维度匹配特征矩阵
-        deg = deg.float().unsqueeze(1)
-
-        # 计算归一化后的特征
-        x_norm = x / torch.sqrt(1 + deg)  # 加上1防止度为零
-
-        # 计算特征差的平方和
-        diff = x_norm[row] - x_norm[col]
-        diff_squared_sum = torch.sum(diff**2, dim=1)
+        # Calculate node degrees
+        degrees = torch.zeros(num_nodes, dtype=X.dtype, device=X.device)
+        degrees.scatter_add_(0, edge_index[0], torch.ones(edge_index.size(1), dtype=X.dtype, device=X.device))
         
-        # 计算 Dirichlet 能量
-        dirichlet_energy = torch.sum(diff_squared_sum).item() / num_nodes
+        # Normalize features by sqrt(1 + degrees)
+        norm_factors = torch.sqrt(1 + degrees).unsqueeze(1)
+        X_norm = X / norm_factors
+        
+        # Compute differences between connected nodes
+        diff = X_norm[edge_index[0]] - X_norm[edge_index[1]]
+        
+        # Calculate Dirichlet energy
+        dirichlet_energy = torch.sum(diff.pow(2)) / num_nodes
         
         return dirichlet_energy
+
 
     def eval(self, index_set):
 
