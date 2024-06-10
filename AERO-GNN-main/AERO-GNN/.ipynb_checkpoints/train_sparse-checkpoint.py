@@ -203,7 +203,7 @@ class Trainer(object):
         print("Mean test accuracy: {:.4f}".format(self.avg_acc), "±", '{:.3f}'.format(self.std_acc))
         print("Mean Dirichlet energy: {:.4f}".format(self.avg_dirichlet_energy), "±", '{:.3f}'.format(self.std_dirichlet_energy))
 
-        iterations = self.args.num_layers
+        iterations = self.args.iterations
         epoch = self.args.epochs
         model = self.args.model
         n_trials = self.args.exp_num
@@ -213,7 +213,7 @@ class Trainer(object):
         avg_dirichlet_energy = self.avg_dirichlet_energy
         std_dirichlet_energy = self.std_dirichlet_energy
 
-        csv_file = 'res.csv'
+        csv_file = f'{self.args.model}.csv'
         file_exists = os.path.isfile(csv_file)
         with open(csv_file, mode='a', newline='') as file:
             writer = csv.writer(file)
