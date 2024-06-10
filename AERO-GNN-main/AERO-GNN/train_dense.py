@@ -96,7 +96,7 @@ class Trainer(object):
         # Calculate Dirichlet energy
         dirichlet_energy = torch.sum(diff.pow(2)) / num_nodes
         
-        return dirichlet_energy
+        return dirichlet_energy/2
 
 
     def eval(self, index_set):
