@@ -44,7 +44,8 @@ pip install dgl-cu113 -f https://data.dgl.ai/wheels/repo.html
 ```
 
 **初次安装会提示：DGL backend not selected or invalid. Assuming PyTorch for now.
-Setting the default backend to "pytorch". You can change it in the <span style="color:red;">~/.dgl/config.json</span> file or export the DGLBACKEND environment variable. Valid options are: pytorch, mxnet, tensorflow (all lowercase)
+Setting the default backend to "pytorch". You can change it in the <span style="color:red;">~/.dgl/config.json</span>
+file or export the DGLBACKEND environment variable. Valid options are: pytorch, mxnet, tensorflow (all lowercase)
 Downloading https://raw.githubusercontent.com/graphdml-uiuc-jlu/geom-gcn/f1fc0d14b3b019c562737240d06ec83b07d16a8f/new_data/chameleon/out1_node_feature_label.txt
 **
 
@@ -117,43 +118,45 @@ Downloading https://raw.githubusercontent.com/graphdml-uiuc-jlu/geom-gcn/f1fc0d1
 | computers | GDC      | 32     |             |
 | computers | GDC      | 64     |             |
 
-
 ## texas数据集
-| Model    | Layers | Performance     |
-|----------|--------|-----------------|
-| AERO-GNN | 1      | Accuracy: 0.8378|
-| AERO-GNN | 2      | Accuracy: 0.7838|
-| AERO-GNN | 4      | Accuracy: 0.7568|
 
+| Model    | Layers | Performance      |
+|----------|--------|------------------|
+| AERO-GNN | 1      | Accuracy: 0.8378 |
+| AERO-GNN | 2      | Accuracy: 0.7838 |
+| AERO-GNN | 4      | Accuracy: 0.7568 |
 
 ## cora数据集
+
 ```bash
 python3 ./AERO-GNN/main.py --model aero  --iterations 32 --dr 0.0001 --dr-prop 0.0001 --dropout 0.7 --add-dropout 0 --lambd 1.0 --num-layers 8 --dataset cora
 ```
-| Layer | Epoch | Model | Trials | Dataset | Performance                  |
-|-------|-------|-------|--------|---------|------------------------------|
-| 1     | 50    | AERO  | 50     | cora    | Accuracy: 0.7496 ± 0.010     |
-| 1     | 50    | AERO  | 50     | cora    | Accuracy: 0.7496 ± 0.010     |
-| 2     | 50    | AERO  | 50     | cora    | Accuracy: 0.7810 ± 0.011     |
-| 4     | 50    | AERO  | 50     | cora    | Accuracy: 0.8019 ± 0.011     |
-| 8     | 50    | AERO  | 50     | cora    | Accuracy: 0.8191 ± 0.009     |
-| 16    | 50    | AERO  | 50     | cora    | Accuracy: 0.8234 ± 0.008     |
-| 32    | 50    | AERO  | 50     | cora    | Accuracy: 0.8176 ± 0.010     |
-| 64    | 50    | AERO  | 50     | cora    | Accuracy: 0.8133 ± 0.010     |
 
+| Layer | Epoch | Model | Trials | Dataset | Performance              |
+|-------|-------|-------|--------|---------|--------------------------|
+| 1     | 2000  | AERO  | 50     | cora    | Accuracy: 0.7496 ± 0.010 |
+| 1     | 2000  | AERO  | 50     | cora    | Accuracy: 0.7496 ± 0.010 |
+| 2     | 2000  | AERO  | 50     | cora    | Accuracy: 0.7810 ± 0.011 |
+| 4     | 2000  | AERO  | 50     | cora    | Accuracy: 0.8019 ± 0.011 |
+| 8     | 2000  | AERO  | 50     | cora    | Accuracy: 0.8191 ± 0.009 |
+| 16    | 2000  | AERO  | 50     | cora    | Accuracy: 0.8234 ± 0.008 |
+| 32    | 2000  | AERO  | 50     | cora    | Accuracy: 0.8176 ± 0.010 |
+| 64    | 2000  | AERO  | 50     | cora    | Accuracy: 0.8133 ± 0.010 |
 
 ## wiki数据集
+
 ```bash
 python3 ./AERO-GNN/main.py --model aero  --iterations 32 --dr 0.0001 --dr-prop 0.0001 --dropout 0.7 --add-dropout 0 --lambd 1.0 --num-layers 8 --dataset wiki
 ```
-| Layer | Epoch | Model | Trials | Dataset | Performance                  |
-|-------|-------|-------|--------|---------|------------------------------|
-| 1     | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7765 ± 0.007     |
-| 2     | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7850 ± 0.007     |
-| 4     | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7886 ± 0.007     |
-| 8     | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7881 ± 0.008     |
-| 16    | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7849 ± 0.010     |
-| 32    | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7826 ± 0.010     |
-| 64    | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7775 ± 0.025     |
+
+| Layer | Epoch | Model | Trials | Dataset | Performance              |
+|-------|-------|-------|--------|---------|--------------------------|
+| 1     | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7765 ± 0.007 |
+| 2     | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7850 ± 0.007 |
+| 4     | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7886 ± 0.007 |
+| 8     | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7881 ± 0.008 |
+| 16    | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7849 ± 0.010 |
+| 32    | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7826 ± 0.010 |
+| 64    | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7775 ± 0.025 |
 
 
