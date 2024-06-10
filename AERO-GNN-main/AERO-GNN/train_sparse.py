@@ -94,6 +94,7 @@ class Trainer(object):
 
         #l2 norm
         dirichlet_energy =torch.norm(diff, p=2, dim=-1)/ num_nodes
+        dirichlet_energy =torch.sum(dirichlet_energy)
         return dirichlet_energy / 2
     
     def eval(self, index_set):
@@ -109,7 +110,7 @@ class Trainer(object):
             correct = pred[index_set].eq(self.target[index_set]).sum().item()
             acc = correct / len(index_set)
             X=X.view(prediction.size(0),-1)
-            dirichlet_energy = self.calculate_dirichlet_energy(X, self.graph.edge_index)
+            dirichlet_energy = self.compute_dirichlet_energy(X, self.graph.edge_index)
 
             return acc, loss, dirichlet_energy
 
