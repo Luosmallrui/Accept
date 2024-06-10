@@ -533,7 +533,7 @@ class GAT_Model(nn.Module):
         self.input_linear = nn.Linear(self.in_channels, self.hid_channels)
 
         self.convs = nn.ModuleList()
-        for _ in range(self.args.num_layers - 1):
+        for _ in range(self.args.num_layers ):
             self.convs.append(GATConv(self.hid_channels * self.num_heads, self.hid_channels,
                                       heads=self.num_heads, concat=True, negative_slope=0.2,
                                       dropout=self.args.dropout, add_self_loops=False))
