@@ -158,12 +158,12 @@ Downloading https://raw.githubusercontent.com/graphdml-uiuc-jlu/geom-gcn/f1fc0d1
 | 16    | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7849 ± 0.010 |
 | 32    | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7826 ± 0.010 |
 | 64    | 2000  | AERO  | 50     | wiki    | Accuracy: 0.7775 ± 0.025 |
-| 1     | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.004 |
-| 2     | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.004 |
-| 4     | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.004 |
-| 8     | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.004 |
-| 16    | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.004 |
-| 32    | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.004 |
-| 64    | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.004 |
+| 1     | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.005 |
+| 2     | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.005 |
+| 4     | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.005 |
+| 8     | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.005 |
+| 16    | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.005 |
+| 32    | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.005 |
+| 64    | 2000  | gcn   | 50     | cora    | Accuracy: 0.7911 ± 0.005 |
 
 
