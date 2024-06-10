@@ -142,7 +142,7 @@ python3 ./AERO-GNN/main.py --model aero  --iterations 32 --dr 0.0001 --dr-prop 0
 | 64    | 50    | AERO  | 50     | cora    | Accuracy: 0.8133 ± 0.010     |
 
 
-## cora数据集
+## wiki数据集
 ```bash
 python3 ./AERO-GNN/main.py --model aero  --iterations 32 --dr 0.0001 --dr-prop 0.0001 --dropout 0.7 --add-dropout 0 --lambd 1.0 --num-layers 8 --dataset wiki
 ```
