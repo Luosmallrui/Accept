@@ -382,7 +382,7 @@ class GCNII_Model(MessagePassing):
 
 class GCN_Model(MessagePassing):
 
-    def __init__(self, args, in_channels, hid_channels, out_channels, num_layers, graph):
+    def __init__(self, args, in_channels, hid_channels, out_channels, graph):
         super().__init__()
 
         self.args = args
@@ -390,7 +390,7 @@ class GCN_Model(MessagePassing):
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.hid_channels = hid_channels
-        self.num_layers = num_layers
+        self.num_layers =  self.args.num_layers
 
         self.num_nodes = graph.x.size(0)
 
