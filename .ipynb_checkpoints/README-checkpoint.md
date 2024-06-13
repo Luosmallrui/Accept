@@ -107,6 +107,7 @@ Downloading https://raw.githubusercontent.com/graphdml-uiuc-jlu/geom-gcn/f1fc0d1
 | 16    | 2000  | aero  | 50       | cora    | 0.8234             | 0.008         | 0.8296                | 0.142                |
 | 32    | 2000  | aero  | 50       | cora    | 0.8176             | 0.010         | 0.8440                | 0.185                |
 | 64    | 2000  | aero  | 50       | cora    | 0.8133             | 0.010         | 1.2234                | 0.257                |
+| 1     | 2000  | gcn   | 50       | wiki    | 0.7788             | 0.006         | 6.2591                | 0.315                |
 
 
 ## wiki数据集
@@ -120,6 +121,8 @@ Downloading https://raw.githubusercontent.com/graphdml-uiuc-jlu/geom-gcn/f1fc0d1
 | 16    | 2000  | aero  | 50       | wiki    | 0.7844             | 0.011         | 2279.2766             | 12285.911            |
 | 32    | 2000  | aero  | 50       | wiki    | 0.7777             | 0.025         | 177577.7500           | 1151560.000          |
 | 64    | 2000  | aero  | 50       | wiki    | 0.7791             | 0.015         | 60581.2383            | 172291.781           |
+| 1     | 2000  | gcn   | 50       | wiki    | 0.7788             | 0.006         | 6.2591                | 0.315                |
+| 2     | 2000  | gcn   | 50       | wiki    | 0.7739             | 0.011         | 7.7679                | 0.560                |
 
 ## cora数据集
 

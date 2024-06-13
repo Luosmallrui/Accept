@@ -203,7 +203,7 @@ class Trainer(object):
         print("Mean test accuracy: {:.4f}".format(self.avg_acc), "±", '{:.3f}'.format(self.std_acc))
         print("Mean Dirichlet energy: {:.4f}".format(self.avg_dirichlet_energy), "±", '{:.3f}'.format(self.std_dirichlet_energy))
 
-        iterations = self.args.iterations
+        iterations = self.args.num_layers
         epoch = self.args.epochs
         model = self.args.model
         n_trials = self.args.exp_num
