@@ -13,3 +13,5 @@ layer,epoch,Model,n trials,dataset,Mean test accuracy,std deviation,Mean Dirichl
 16,2000,gcn,50,cora,0.2086,0.067,0.1115,0.066
 32,2000,gcn,50,cora,0.1996,0.065,0.1004,0.064
 64,2000,gcn,50,cora,0.1988,0.073,0.0916,0.069
+32,2000,gcn,50,cora,0.1914,0.060,0.1197,0.071
+64,2000,gcn,50,cora,0.2120,0.074,0.0878,0.069
