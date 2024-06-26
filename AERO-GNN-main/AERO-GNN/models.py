@@ -465,7 +465,7 @@ class GAT_v2_Model(nn.Module):
         self.convs = nn.ModuleList()
         for i in range(self.args.num_layers):#通过num_layers修改
             self.convs.append(
-                GATv2_Conv(self.hid_channels * self.num_heads, self.hid_channels,
+                GATv2_Conv(self.hid_channels, self.hid_channels,
                             heads = self.num_heads,
                             concat = True,
                             negative_slope=0.2,
@@ -484,7 +484,7 @@ class GAT_v2_Model(nn.Module):
                             share_weights = True,
                             )
 
-        self.convs[-1] = GATv2_Conv(self.hid_channels * self.num_heads, self.out_channels,
+        self.convs[-1] = GATv2_Conv(self.hid_channels, self.out_channels,
                             heads = self.num_heads,
                             concat = False,
                             negative_slope=0.2,
@@ -535,7 +535,7 @@ class GAT_Model(nn.Module):
         self.convs = nn.ModuleList()
         for i in range(self.args.num_layers):#num_layers
             self.convs.append(
-                GATConv(self.hid_channels * self.num_heads, self.hid_channels,
+                GATConv(self.hid_channels, self.hid_channels,
                             heads = self.num_heads,
                             concat = True,
                             negative_slope=0.2,
@@ -554,7 +554,7 @@ class GAT_Model(nn.Module):
                             share_weights = True,
                             )
 
-        self.convs[-1] = GATConv(self.hid_channels * self.num_heads, self.out_channels,
+        self.convs[-1] = GATConv(self.hid_channels, self.out_channels,
                             heads = self.num_heads,
                             concat = False,
                             negative_slope=0.2,
@@ -604,7 +604,7 @@ class GAT_v2_Res_Model(nn.Module):
         self.convs = nn.ModuleList()
         for i in range(self.args.num_layers):
             self.convs.append(
-                GATv2_Conv(self.hid_channels * self.num_heads, self.hid_channels,
+                GATv2_Conv(self.hid_channels, self.hid_channels,
                             heads = self.num_heads,
                             concat = True,
                             negative_slope=0.2,
@@ -623,7 +623,7 @@ class GAT_v2_Res_Model(nn.Module):
                             share_weights = True,
                             )
 
-        self.convs[-1] = GATv2_Conv(self.hid_channels * self.num_heads, self.out_channels,
+        self.convs[-1] = GATv2_Conv(self.hid_channels, self.out_channels,
                             heads = self.num_heads,
                             concat = False,
                             negative_slope=0.2,
