@@ -47,6 +47,7 @@ class Trainer(object):
         if self.args.model == 'gprgnn': Model = GPR_GNN_Model
         if self.args.model == 'dagnn': Model = DAGNN_Model
         if self.args.model == 'mixhop': Model = MixHop_Model
+        if self.args.model == 'sage': Model = GraphSAGE
 
         self.model = Model(self.args,
                            self.in_channels,
