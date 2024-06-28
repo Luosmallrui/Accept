@@ -148,6 +148,7 @@ class Trainer(object):
             if close: break
 
     def loss_step_counter(self, val_loss):
+        self.test_dirichlet_energy=0
         if val_loss <= self.best_val_loss:
             self.best_val_loss = val_loss
             self.test_accuracy, _, self.test_dirichlet_energy = self.eval(self.test_nodes)
