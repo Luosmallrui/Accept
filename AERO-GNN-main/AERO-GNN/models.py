@@ -11,7 +11,7 @@ import torch.nn.functional as F
 from torch_sparse import SparseTensor, matmul
 
 import torch_geometric
-from torch_geometric.nn import GCN2Conv, GCNConv, GATConv, GATv2Conv, FAConv, TransformerConv
+from torch_geometric.nn import GCN2Conv,SAGEConv, GCNConv, GATConv, GATv2Conv, FAConv, TransformerConv
 from torch_geometric.nn import aggr, inits
 from torch_geometric.nn.conv import MessagePassing
 from torch_geometric.nn.dense.linear import Linear
@@ -944,4 +944,45 @@ class ADGN_Model(MessagePassing):#通过iterations控制
 
         return x,x
 
+class GraphSAGE(nn.Module):
+    def __init__(self, args, in_channels, hid_channels, out_channels, graph):
+        super(GraphSAGE, self).__init__()
+        self.args = args
 
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.hid_channels = hid_channels
+
+        self.num_heads = self.args.num_heads
+
+        self.setup_layers()
+        self.reset_parameters()
+        
+    def setup_layers(self):
+
+        self.convs = nn.ModuleList()
+        for i in range(self.args.num_layers):#num_layers
+            self.convs.append(
+               SAGEConv(self.hid_channels, self.hid_channels)
+                )
+
+        self.convs[0] = SAGEConv(self.in_channels, self.hid_channels)
+
+        self.convs[-1] = SAGEConv(self.hid_channels, self.out_channels)
+
+        self.dropout = nn.Dropout(self.args.dropout)
+        self.elu = F.elu
+
+    def reset_parameters(self):
+        for conv in self.convs:
+            conv.reset_parameters()
+ 
+    def forward(self, x, edge_index):
+        x = self.dropout(x)
+        for i in range(self.args.num_layers - 1):
+            x = self.convs[i](x, edge_index)
+            x = self.elu(x)
+            x = self.dropout(x)
+        x1 = self.convs[-1](x, edge_index)
+
+        return x,x1 
