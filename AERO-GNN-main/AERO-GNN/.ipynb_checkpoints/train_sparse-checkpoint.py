@@ -194,7 +194,7 @@ class Trainer(object):
         self.avg_acc = sum(acc) / len(acc)
         self.std_acc = torch.std(torch.tensor(acc)).item()
         self.avg_dirichlet_energy = sum(dirichlet_energies) / len(dirichlet_energies)
-        self.std_dirichlet_energy = torch.std(torch.tensor(dirichlet_energies)).item()
+        self.std_dirichlet_energy = torch.std(torch.tensor(dirichlet_energies, dtype=torch.float32)).item()
 
         print(f"layer:{self.args.num_layers}")
         print("epoch", self.args.epochs)
@@ -203,8 +203,9 @@ class Trainer(object):
         print('dataset: {}'.format(self.args.dataset))
         print("Mean test accuracy: {:.4f}".format(self.avg_acc), "±", '{:.3f}'.format(self.std_acc))
         print("Mean Dirichlet energy: {:.4f}".format(self.avg_dirichlet_energy), "±", '{:.3f}'.format(self.std_dirichlet_energy))
-
         iterations = self.args.num_layers
+        if self.args.model == 'mixhop': 
+            iterations = self.args.iterations
         epoch = self.args.epochs
         model = self.args.model
         n_trials = self.args.exp_num
