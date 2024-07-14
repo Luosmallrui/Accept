@@ -205,7 +205,7 @@ class Trainer(object):
         print("Mean Dirichlet energy: {:.4f}".format(self.avg_dirichlet_energy), "±", '{:.3f}'.format(self.std_dirichlet_energy))
         iterations = self.args.num_layers
         if self.args.model == 'mixhop': 
-            iterations = self.args.iterations
+            iterations = self.args.num_layers
         epoch = self.args.epochs
         model = self.args.model
         n_trials = self.args.exp_num
