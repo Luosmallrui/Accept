@@ -67,17 +67,16 @@ class Trainer(object):
         if self.exp == 0: self.graph = self.graph.to(self.device)
         self.target = self.target.long().squeeze().to(self.device)
         self.model = self.model.to(self.device)
-
-    def compute_dirichlet_energy(self, X, edge_index):
+    def calculate_dirichlet_energy(self,X, edge_index):
         """
-    Calculate the Dirichlet energy for a given feature matrix X and edge index.
+        Calculate the Dirichlet energy for a given feature matrix X and edge index.
 
-    Parameters:
-    X (torch.Tensor): Feature matrix of shape (num_nodes, num_features)
-    edge_index (torch.Tensor): Edge index matrix of shape (2, num_edges)
+        Parameters:
+        X (torch.Tensor): Feature matrix of shape (num_nodes, num_features)
+        edge_index (torch.Tensor): Edge index matrix of shape (2, num_edges)
 
-    Returns:
-    torch.Tensor: Dirichlet energy
+        Returns:
+        torch.Tensor: Dirichlet energy
         """
         num_nodes = X.size(0)
 
@@ -93,9 +92,9 @@ class Trainer(object):
         diff = X_norm[edge_index[0]] - X_norm[edge_index[1]]
 
         #l2 norm
-        dirichlet_energy =torch.norm(diff, p=2, dim=-1)/ num_nodes
-        dirichlet_energy =torch.sum(dirichlet_energy)
+        dirichlet_energy =torch.norm(diff, p=2, dim=1).sum()/ num_nodes
         return dirichlet_energy / 2
+
     
     def eval(self, index_set):
 
@@ -110,7 +109,7 @@ class Trainer(object):
             correct = pred[index_set].eq(self.target[index_set]).sum().item()
             acc = correct / len(index_set)
             X=X.view(prediction.size(0),-1)
-            dirichlet_energy = self.compute_dirichlet_energy(X, self.graph.edge_index)
+            dirichlet_energy = self.calculate_dirichlet_energy(X, self.graph.edge_index)
 
             return acc, loss, dirichlet_energy
 
@@ -206,6 +205,8 @@ class Trainer(object):
         iterations = self.args.num_layers
         if self.args.model == 'mixhop': 
             iterations = self.args.num_layers
+        elif sele.args.model == 'appnp': 
+            iterations = self.args.iterations
         epoch = self.args.epochs
         model = self.args.model
         n_trials = self.args.exp_num
