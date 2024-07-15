@@ -194,8 +194,7 @@ class Trainer(object):
         self.std_acc = torch.std(torch.tensor(acc)).item()
         self.avg_dirichlet_energy = sum(dirichlet_energies) / len(dirichlet_energies)
         self.std_dirichlet_energy = torch.std(torch.tensor(dirichlet_energies, dtype=torch.float32)).item()
-
-        print(f"layer:{self.args.num_layers}")
+        print(f"layer:{self.args.iterations}")
         print("epoch", self.args.epochs)
         print("Model: {}".format(self.args.model))
         print('n trials: {}'.format(self.args.exp_num))
