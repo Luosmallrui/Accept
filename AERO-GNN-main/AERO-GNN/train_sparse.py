@@ -205,7 +205,7 @@ class Trainer(object):
         iterations = self.args.num_layers
         if self.args.model == 'mixhop': 
             iterations = self.args.num_layers
-        elif sele.args.model == 'appnp': 
+        elif self.args.model == 'appnp': 
             iterations = self.args.iterations
         epoch = self.args.epochs
         model = self.args.model
