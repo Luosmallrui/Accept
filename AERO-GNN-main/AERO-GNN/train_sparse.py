@@ -26,28 +26,26 @@ class Trainer(object):
         self.hid_channels = self.args.hid_dim
         self.out_channels = int(torch.max(self.target).item() + 1)
 
-    def create_model(self):
-        model_classes = {
-        'aero': AERO_GNN_Model,
-        'gcn': GCN_Model,
-        'appnp': APPNP_Model,
-        'gcn2': GCNII_Model,
-        'adgn': ADGN_Model,
-        'gat': GAT_Model,
-        'gatv2': GAT_v2_Model,
-        'gt': GT_Model,
-        'gat-res': GAT_v2_Res_Model,
-        'fagcn': FAGCN_Model,
-        'gprgnn': GPR_GNN_Model,
-        'dagnn': DAGNN_Model,
-        'mixhop': MixHop_Model,
-        'graphsage':GraphSAGE,
-         }
+     def create_model(self):
 
-        Model = model_classes.get(self.args.model)
+        if self.args.model == 'aero': Model = AERO_GNN_Model
 
-        if Model is None:
-           raise ValueError(f"Unsupported model type: {self.args.model}")
+        if self.args.model == 'gcn': Model = GCN_Model
+        if self.args.model == 'appnp': Model = APPNP_Model
+
+        if self.args.model == 'gcn2': Model = GCNII_Model
+        if self.args.model == 'adgn': Model = ADGN_Model
+
+        if self.args.model == 'gat': Model = GAT_Model
+        if self.args.model == 'gatv2': Model = GAT_v2_Model
+        if self.args.model == 'gt': Model = GT_Model
+        if self.args.model == 'gat-res': Model = GAT_v2_Res_Model
+        if self.args.model == 'fagcn': Model = FAGCN_Model
+
+        if self.args.model == 'gprgnn': Model = GPR_GNN_Model
+        if self.args.model == 'dagnn': Model = DAGNN_Model
+        if self.args.model == 'mixhop': Model = MixHop_Model
+        if self.args.model == 'sage': Model = GraphSAGE
 
         self.model = Model(self.args,
                            self.in_channels,
