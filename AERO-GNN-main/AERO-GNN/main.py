@@ -42,7 +42,7 @@ def parameter_parser():
     parser.add_argument("--num-heads", type=int, default=1, ) # Attention Heads
     parser.add_argument("--lambd", type=float, default=1.0,) # Decay Weighting for GCNII and AERO-GNN
     parser.add_argument("--alpha", type=float, default=0.1, ) # for GCNII, GPRGNN, APPNP, ADGN
-    parser.add_argument("--lambd-l2", type=float, default=0,) # L2 Reg
+    parser.add_argument("--lambd-l2", type=float, default=0.02,) # L2 Reg
 
     return parser.parse_args()
 
