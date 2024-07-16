@@ -315,8 +315,9 @@ class GPR_GNN_Model(MessagePassing):
         h = self.node_label_pred(x)
         edge_idx, a = gcn_norm(edge_idx, num_nodes = self.num_nodes, add_self_loops=False)
         z = self.gpr_propagate(a, h, edge_idx)
+        z1= self.node_label_pred(z)
         
-        return z,z
+        return z,z1
 
     def message(self, x_j, norm):
         return x_j * norm.view(-1, 1)
