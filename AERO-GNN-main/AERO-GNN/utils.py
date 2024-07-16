@@ -84,9 +84,28 @@ def fixed_split(args, graph, exp_num):
             
     else:
         print('No train_mask found.')
+        train_idx, val_idx, test_idx=random_splits(graph)
+        
 
     return train_idx, val_idx, test_idx
+def random_splits(graph, ratio=(0.6, 0.2, 0.2)):
+        labels = torch.clone(graph.y)
+        train_ratio, val_ratio, test_ratio = ratio
+        assert sum(ratio) == 1.0
+        num_classes= int(torch.max(labels).item() + 1)
 
+        indices = []
+        for i in range(num_classes):
+            index = (labels == i).nonzero().view(-1)
+            index = index[torch.randperm(index.size(0))]
+            indices.append([index, len(index)])
+
+        train_index = torch.cat([i[:int(train_ratio * num)] for i, num in indices], dim=0)
+        val_index = torch.cat([i[int(train_ratio * num): int((train_ratio + val_ratio) * num)] for i, num in indices],
+                              dim=0)
+        test_index = torch.cat([i[int((train_ratio + val_ratio) * num):] for i, num in indices], dim=0)
+      
+        return train_index, val_index, test_index
 
 def sparse_split(graph, train_ratio, val_ratio):
 
