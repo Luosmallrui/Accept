@@ -5,3 +5,4 @@ layer,epoch,Model,n trials,dataset,Mean test accuracy,std deviation,Mean Dirichl
 8,2000,adgn,50,cora,0.1897,0.093,0.0556,0.013
 16,2000,adgn,50,cora,0.2151,0.080,0.1098,0.034
 32,2000,adgn,50,cora,0.7195,0.083,1.2731,0.157
+64,2000,adgn,50,cora,0.7781,0.028,3.0040,0.384
