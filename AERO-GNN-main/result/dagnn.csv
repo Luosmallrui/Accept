@@ -12,3 +12,8 @@ layer,epoch,Model,n trials,dataset,Mean test accuracy,std deviation,Mean Dirichl
 8,2000,dagnn,50,wiki,0.7338,0.010,0.3323,0.012
 16,2000,dagnn,50,wiki,0.7415,0.011,0.1198,0.007
 32,2000,dagnn,50,wiki,0.7215,0.014,0.0223,0.004
+64,2000,dagnn,50,wiki,0.6763,0.019,0.0038,0.001
+1,2000,dagnn,50,pubmed,0.3426,0.106,0.0222,0.012
+2,2000,dagnn,50,pubmed,0.3159,0.117,0.0071,0.004
+4,2000,dagnn,50,pubmed,0.3554,0.149,0.0048,0.003
+8,2000,dagnn,50,pubmed,0.7704,0.009,0.0211,0.007
