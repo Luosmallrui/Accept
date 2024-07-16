@@ -72,12 +72,12 @@ Downloading https://raw.githubusercontent.com/graphdml-uiuc-jlu/geom-gcn/f1fc0d1
 - GCN
 - APPNP
 - A-DGN
+- GT
 - GAT
-- MixHop
+- GAT_RES
 - GPRGNN
 - DAGNN
 - GraphSage
-- GDC (Graph Diffusion Convolution)
 
 ## 层数
 
