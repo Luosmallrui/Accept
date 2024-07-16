@@ -1,0 +1,2 @@
+layer,epoch,Model,n trials,dataset,Mean test accuracy,std deviation,Mean Dirichlet energy,std Dirichlet energy
+2,2000,graphsage,50,pubmed,0.7567,0.009,0.0000,0.000
