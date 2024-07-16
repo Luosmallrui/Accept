@@ -28,8 +28,8 @@ def parameter_parser():
 
 
     """HYPERPARAMETERS"""
-    parser.add_argument("--iterations", type=int, default=10) # L_P
-    parser.add_argument("--num-layers", type = int, default = 1) # L_M
+    parser.add_argument("--iterations", type=int, default=2) # L_P
+    parser.add_argument("--num-layers", type = int, default = 2) # L_M
 
     parser.add_argument("--dropout", type=float, default=0.6,)
     parser.add_argument("--add-dropout", type = int, default = 0) # Last Layer Dropout
