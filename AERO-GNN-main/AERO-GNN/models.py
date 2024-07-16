@@ -200,6 +200,7 @@ class APPNP_Model(MessagePassing):
         self.linear_node_2.reset_parameters()
 
     def node_label_pred(self, x):
+        print("Shape of x before processing:", x.shape)
         
         x = self.dropout(x)
 
@@ -710,7 +711,7 @@ class FAGCN_Model(MessagePassing):
                                     cached = True,
                                     add_self_loops = False,
                                     normalize = True,
-                                    return_attention_weights = True,)
+                                    )
                                     )
 
         self.dropout = nn.Dropout(self.args.dropout)

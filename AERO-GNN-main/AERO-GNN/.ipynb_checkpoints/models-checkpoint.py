@@ -11,7 +11,7 @@ import torch.nn.functional as F
 from torch_sparse import SparseTensor, matmul
 
 import torch_geometric
-from torch_geometric.nn import GCN2Conv, GCNConv, GATConv, GATv2Conv, FAConv, TransformerConv
+from torch_geometric.nn import GCN2Conv,SAGEConv, GCNConv, GATConv, GATv2Conv, FAConv, TransformerConv
 from torch_geometric.nn import aggr, inits
 from torch_geometric.nn.conv import MessagePassing
 from torch_geometric.nn.dense.linear import Linear
@@ -200,6 +200,7 @@ class APPNP_Model(MessagePassing):
         self.linear_node_2.reset_parameters()
 
     def node_label_pred(self, x):
+        print("Shape of x before processing:", x.shape)
         
         x = self.dropout(x)
 
@@ -233,8 +234,9 @@ class APPNP_Model(MessagePassing):
         h = self.node_label_pred(x)
         edge_index, a = gcn_norm(edge_index, num_nodes = self.num_nodes, add_self_loops=False)
         z = self.ppr_propagate(a, h, edge_index)
+        z1=self.node_label_pred(z)
 
-        return z,z
+        return z,z1
 
     def message(self, x_j: Tensor, edge_weight: OptTensor) -> Tensor:
         return x_j * edge_weight.view(-1, 1)
@@ -314,8 +316,9 @@ class GPR_GNN_Model(MessagePassing):
         h = self.node_label_pred(x)
         edge_idx, a = gcn_norm(edge_idx, num_nodes = self.num_nodes, add_self_loops=False)
         z = self.gpr_propagate(a, h, edge_idx)
+        z1= self.node_label_pred(z)
         
-        return z,z
+        return z,z1
 
     def message(self, x_j, norm):
         return x_j * norm.view(-1, 1)
@@ -461,6 +464,8 @@ class GAT_v2_Model(nn.Module):
         self.reset_parameters()
         
     def setup_layers(self):
+        # Input layer: Linear layer
+        self.input_linear = nn.Linear(self.in_channels, self.hid_channels)
 
         self.convs = nn.ModuleList()
         for i in range(self.args.num_layers):#通过num_layers修改
@@ -474,26 +479,8 @@ class GAT_v2_Model(nn.Module):
                             share_weights = True,
                             )
                 )
-
-        self.convs[0] = GATv2_Conv(self.in_channels, self.hid_channels,
-                            heads = self.num_heads,
-                            concat = True,
-                            negative_slope=0.2,
-                            dropout = self.args.dropout,
-                            add_self_loops = False,
-                            share_weights = True,
-                            )
-
-        self.convs[-1] = GATv2_Conv(self.hid_channels * self.num_heads, self.out_channels,
-                            heads = self.num_heads,
-                            concat = False,
-                            negative_slope=0.2,
-                            dropout = self.args.dropout,
-                            add_self_loops = False,
-                            share_weights = True,
-                            )
-
-
+        # Output layer: Linear layer
+        self.output_linear = nn.Linear(self.hid_channels, self.out_channels)
         self.dropout = nn.Dropout(self.args.dropout)
         self.elu = F.elu
 
@@ -501,16 +488,15 @@ class GAT_v2_Model(nn.Module):
         for conv in self.convs:
             conv.reset_parameters()
 
-    def forward(self, x, edge_index):
-        
+    def forward(self, x, edge_index):       
 
         x = self.dropout(x)
-        for i in range(self.args.num_layers - 1):
+        x = self.input_linear(x)
+        for i in range(self.args.num_layers ):
             x, alpha_unnorm, alpha_norm, x_lin = self.convs[i](x, edge_index, return_attention_weights = True)
             x = self.elu(x)
             x = self.dropout(x)
-
-        x1, alpha_unnorm, alpha_norm, x_lin = self.convs[-1](x, edge_index, return_attention_weights = True)
+        x1 = self.output_linear(x)
                 
         return x,x1
 
@@ -556,12 +542,7 @@ class GAT_Model(nn.Module):
                 )
 
         # Final GATConv layer
-        self.final_conv=GATConv(self.hid_channels * self.num_heads, self.out_channels,
-                    heads=self.num_heads,
-                    concat=False,  # Ensure concat is False for the last layer
-                    negative_slope=0.2,
-                    dropout=self.args.dropout,
-                    add_self_loops=False)
+        self.final_conv=nn.Linear(self.hid_channels, self.out_channels)
 
         self.dropout = nn.Dropout(self.args.dropout)
         self.elu = F.elu
@@ -575,8 +556,8 @@ class GAT_Model(nn.Module):
             x = self.elu(conv(x, edge_index))
             x = self.dropout(x)
 
-        x = self.final_conv(x, edge_index)
-        return x,x
+        x1 = self.final_conv(x)
+        return x,x1
 
 
 class GAT_v2_Res_Model(nn.Module):
@@ -596,6 +577,8 @@ class GAT_v2_Res_Model(nn.Module):
         self.reset_parameters()
         
     def setup_layers(self):
+        # Input layer: Linear layer
+        self.input_linear = nn.Linear(self.in_channels, self.hid_channels)
 
 
         self.convs = nn.ModuleList()
@@ -610,25 +593,8 @@ class GAT_v2_Res_Model(nn.Module):
                             share_weights = True,
                             )
                 )
-
-        self.convs[0] = GATv2_Conv(self.in_channels, self.hid_channels,
-                            heads = self.num_heads,
-                            concat = True,
-                            negative_slope=0.2,
-                            dropout = 0,
-                            add_self_loops = False,
-                            share_weights = True,
-                            )
-
-        self.convs[-1] = GATv2_Conv(self.hid_channels * self.num_heads, self.out_channels,
-                            heads = self.num_heads,
-                            concat = False,
-                            negative_slope=0.2,
-                            dropout = 0,
-                            add_self_loops = False,
-                            share_weights = True,
-                            )
-
+        # Output layer: Linear layer
+        self.output_linear = nn.Linear(self.hid_channels, self.out_channels)
         self.dropout = nn.Dropout(self.args.dropout)
         self.elu = F.elu
 
@@ -639,13 +605,14 @@ class GAT_v2_Res_Model(nn.Module):
     def forward(self, x, edge_index):
         
         x = self.dropout(x)
+        x = self.input_linear(x)
         for i in range(self.args.num_layers - 1):
             x, alpha_unnorm, alpha_norm, x_lin = self.convs[i](x, edge_index, return_attention_weights = True)        
             if i == 0: x0 = x_lin.view(-1, self.hid_channels * self.num_heads)
             x = x * (1 - self.alpha)  +  x0 * self.alpha            
             x = self.elu(x)
             x = self.dropout(x)
-        x1, alpha_unnorm, alpha_norm, x_lin = self.convs[-1](x, edge_index, return_attention_weights = True)
+        x1 = self.output_linear(x)
         
         return x,x1
 
@@ -693,7 +660,7 @@ class DAGNN_Model(MessagePassing):
         retain_score = retain_score.unsqueeze(1)
         out = torch.matmul(retain_score, pps).squeeze()
 
-        return out
+        return x,out
 
     def forward(self, x, edge_index):
 
@@ -701,7 +668,7 @@ class DAGNN_Model(MessagePassing):
         x = F.relu(self.lin1(x))
         x1 = F.dropout(x, p=self.args.dropout, training=self.training)
         x1 = self.lin2(x1)
-        x1 = self.prop(x1, edge_index)
+        x,x1 = self.prop(x1, edge_index)
         
         return x,x1
 
@@ -744,7 +711,7 @@ class FAGCN_Model(MessagePassing):
                                     cached = True,
                                     add_self_loops = False,
                                     normalize = True,
-                                    return_attention_weights = True,)
+                                    )
                                     )
 
         self.dropout = nn.Dropout(self.args.dropout)
@@ -786,6 +753,8 @@ class GT_Model(nn.Module):#通过num_layers控制
         
 
     def setup_layers(self):
+        # Input layer: Linear layer
+        self.input_linear = nn.Linear(self.in_channels, self.hid_channels)
 
         self.convs = nn.ModuleList()
         for i in range(self.args.num_layers):
@@ -798,19 +767,8 @@ class GT_Model(nn.Module):#通过num_layers控制
                             )
                 )
 
-        self.convs[0] = TransformerConv(self.in_channels, self.hid_channels,
-                            heads = self.num_heads,
-                            concat = True,
-                            dropout = self.args.dropout,
-                            beta = False,
-                            )
-
-        self.convs[-1] = TransformerConv(self.hid_channels * self.num_heads, self.out_channels,
-                            heads = self.num_heads,
-                            concat = False,
-                            dropout = self.args.dropout,
-                            beta = False,
-                            )
+        # Output layer: Linear layer
+        self.output_linear = nn.Linear(self.hid_channels, self.out_channels)
 
         self.dropout = nn.Dropout(self.args.dropout)
         self.elu = F.elu
@@ -824,12 +782,13 @@ class GT_Model(nn.Module):#通过num_layers控制
     def forward(self, x, edge_index):
         
         x = self.dropout(x)
+        x = self.input_linear(x)
         for i in range(self.args.num_layers - 1):
             x = self.convs[i](x, edge_index)
             x = self.elu(x)
             x = self.dropout(x)
 
-        x1 = self.convs[-1](x, edge_index)
+        x1 = self.output_linear(x)
 
         return x,x1
 
@@ -940,8 +899,52 @@ class ADGN_Model(MessagePassing):#通过iterations控制
         x = self.lins[0](x)
         x = self.dropout(x)
         x = self.conv(x, edge_index)
+        x1 = self.lins[-1](x)
+
+        return x,x1
+
+class GraphSAGE(nn.Module):
+    def __init__(self, args, in_channels, hid_channels, out_channels, graph):
+        super(GraphSAGE, self).__init__()
+        self.args = args
+
+        self.in_channels = in_channels
+        self.out_channels = out_channels
+        self.hid_channels = hid_channels
+
+        self.num_heads = self.args.num_heads
+
+        self.setup_layers()
+        self.reset_parameters()
+        
+    def setup_layers(self):
+        # Input layer: Linear layer
+        self.input_linear = nn.Linear(self.in_channels, self.hid_channels)
+
+
+        self.convs = nn.ModuleList()
+        for i in range(self.args.num_layers):#num_layers
+            self.convs.append(
+               SAGEConv(self.hid_channels, self.hid_channels)
+                )
+
+        # Output layer: Linear layer
+        self.output_linear = nn.Linear(self.hid_channels, self.out_channels)
+
+        self.dropout = nn.Dropout(self.args.dropout)
+        self.elu = F.elu
+
+    def reset_parameters(self):
+        for conv in self.convs:
+            conv.reset_parameters()
+ 
+    def forward(self, x, edge_index):
         x = self.dropout(x)
+        x = self.input_linear(x)
+        for i in range(self.args.num_layers - 1):
+            x = self.convs[i](x, edge_index)
+            x = self.elu(x)
+            x = self.dropout(x)
+        x1 = self.output_linear(x)
 
-        return x,x
-
-
+        return x,x1 

@@ -13,37 +13,37 @@ import pdb
 def load_graph(args):
     
     if args.dataset in ['cora', 'citeseer', 'pubmed']:
-        graph = Planetoid(root='./graph-data', name=args.dataset.capitalize(), split = 'public')[0]
+        graph = Planetoid(root='../graph-data', name=args.dataset.capitalize(), split = 'public')[0]
         graph.edge_index, _ = remove_self_loops(graph.edge_index)
         transform = T.Compose([T.AddSelfLoops(), T.NormalizeFeatures()])
         graph = transform(graph)
     
     elif args.dataset == 'wiki':
-        graph = WikiCS(root='./graph-data/Wiki-CS', is_undirected=True)[0]
+        graph = WikiCS(root='../graph-data/Wiki-CS', is_undirected=True)[0]
         graph.edge_index, _ = remove_self_loops(graph.edge_index)
         transform = T.Compose([T.AddSelfLoops(), T.ToUndirected(),])
         graph = transform(graph)
 
     elif args.dataset in ['photo', 'computers']:
-        graph = Amazon(root='./graph-data', name=args.dataset.capitalize())[0]
+        graph = Amazon(root='../graph-data', name=args.dataset.capitalize())[0]
         graph.edge_index, _ = remove_self_loops(graph.edge_index)
         transform = T.Compose([T.AddSelfLoops(), T.NormalizeFeatures()])
         graph = transform(graph)
     
     elif args.dataset in ['texas', 'cornell', 'wisconsin']:
-        graph = WebKB(root='./graph-data', name=args.dataset.capitalize())[0]
+        graph = WebKB(root='../graph-data', name=args.dataset.capitalize())[0]
         graph.edge_index, _ = remove_self_loops(graph.edge_index)
         transform = T.Compose([T.AddSelfLoops(), T.ToUndirected(), T.NormalizeFeatures()])
         graph = transform(graph)
 
     elif args.dataset in ['squirrel', 'chameleon']:
-        graph = WikipediaNetwork(root='./graph-data', name=args.dataset.capitalize())[0]
+        graph = WikipediaNetwork(root='../graph-data', name=args.dataset.capitalize())[0]
         graph.edge_index, _ = remove_self_loops(graph.edge_index)
         transform = T.Compose([T.AddSelfLoops(), T.ToUndirected(),])
         graph = transform(graph)
 
     elif args.dataset == 'actor':
-        graph = Actor(root='./graph-data/actor')[0]
+        graph = Actor(root='../graph-data/actor')[0]
         graph.edge_index, _ = remove_self_loops(graph.edge_index)
         transform = T.Compose([T.AddSelfLoops(), T.ToUndirected(),])
         graph = transform(graph)

@@ -12,7 +12,11 @@ from utils import fixed_split, sparse_split, init_optimizer
 
 control = {
     "dagnn": "iterations",
-    "mixhop": "num_layers"
+    "mixhop": "num_layers",
+    "appnp": "iterations",
+    "adgn" :  "iterations",
+    "fagcn" : "iterations",
+    "graphsage": "num_layers",
 }
 
 
@@ -169,7 +173,7 @@ class Trainer(object):
 
         acc = []
         dirichlet_energies = []
-        seeds = torch.load('./seeds_100.pt')
+        seeds = torch.load('../seeds_100.pt')
 
         for _ in range(self.args.exp_num):
             self.exp = _
@@ -222,7 +226,7 @@ class Trainer(object):
         avg_dirichlet_energy = self.avg_dirichlet_energy
         std_dirichlet_energy = self.std_dirichlet_energy
 
-        csv_file = os.path.join('result', f'{self.args.model}.csv')
+        csv_file = os.path.join('../result', f'{self.args.model}.csv')
         file_exists = os.path.isfile(csv_file)
         with open(csv_file, mode='a', newline='') as file:
             writer = csv.writer(file)

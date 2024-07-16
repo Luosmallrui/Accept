@@ -1,3 +1,0 @@
-layer,epoch,Model,n trials,dataset,Mean test accuracy,std deviation,Mean Dirichlet energy,std Dirichlet energy
-1,2000,aero,50,wiki,0.7765,0.007,40.5089,7.922
-2,2000,aero,50,wiki,0.7850,0.007,25.9188,6.531
