@@ -26,7 +26,7 @@ class Trainer(object):
         self.hid_channels = self.args.hid_dim
         self.out_channels = int(torch.max(self.target).item() + 1)
 
-     def create_model(self):
+    def create_model(self):
 
         if self.args.model == 'aero': Model = AERO_GNN_Model
 
@@ -68,7 +68,7 @@ class Trainer(object):
         if self.exp == 0: self.graph = self.graph.to(self.device)
         self.target = self.target.long().squeeze().to(self.device)
         self.model = self.model.to(self.device)
- def calculate_dirichlet_energy(self,X, edge_index):
+    def calculate_dirichlet_energy(self,X, edge_index):
         """
         Calculate the Dirichlet energy for a given feature matrix X and edge index.
         

@@ -47,6 +47,7 @@ class Trainer(object):
         if self.args.model == 'gprgnn': Model = GPR_GNN_Model
         if self.args.model == 'dagnn': Model = DAGNN_Model
         if self.args.model == 'mixhop': Model = MixHop_Model
+        if self.args.model == 'graphsage': Model = GraphSAGE
 
         self.model = Model(self.args,
                            self.in_channels,
@@ -70,34 +71,33 @@ class Trainer(object):
         self.target = self.target.long().squeeze().to(self.device)
         self.model = self.model.to(self.device)
 
-    def compute_dirichlet_energy(self, X, edge_index):
+    def calculate_dirichlet_energy(self,X, edge_index):
         """
-    Calculate the Dirichlet energy for a given feature matrix X and edge index.
-
-    Parameters:
-    X (torch.Tensor): Feature matrix of shape (num_nodes, num_features)
-    edge_index (torch.Tensor): Edge index matrix of shape (2, num_edges)
-
-    Returns:
-    torch.Tensor: Dirichlet energy
+        Calculate the Dirichlet energy for a given feature matrix X and edge index.
+        
+        Parameters:
+        X (torch.Tensor): Feature matrix of shape (num_nodes, num_features)
+        edge_index (torch.Tensor): Edge index matrix of shape (2, num_edges)
+        
+        Returns:
+        torch.Tensor: Dirichlet energy
         """
         num_nodes = X.size(0)
-
+        
         # Calculate node degrees
         degrees = torch.zeros(num_nodes, dtype=X.dtype, device=X.device)
         degrees.scatter_add_(0, edge_index[0], torch.ones(edge_index.size(1), dtype=X.dtype, device=X.device))
-
+        
         # Normalize features by sqrt(1 + degrees)
         norm_factors = torch.sqrt(1 + degrees).unsqueeze(1)
         X_norm = X / norm_factors
-
+        
         # Compute differences between connected nodes
         diff = X_norm[edge_index[0]] - X_norm[edge_index[1]]
-
+        
         #l2 norm
-        dirichlet_energy =torch.norm(diff, p=2, dim=-1)/ num_nodes
-        return dirichlet_energy / 2
-
+        dirichlet_energy =torch.norm(diff, p=2, dim=1).sum()/ num_nodes
+        return dirichlet_energy / 2   
     def eval(self, index_set):
 
         self.model.eval()

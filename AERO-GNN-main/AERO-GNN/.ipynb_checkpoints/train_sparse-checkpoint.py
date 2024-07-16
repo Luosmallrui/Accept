@@ -27,27 +27,25 @@ class Trainer(object):
         self.out_channels = int(torch.max(self.target).item() + 1)
 
     def create_model(self):
-        model_classes = {
-        'aero': AERO_GNN_Model,
-        'gcn': GCN_Model,
-        'appnp': APPNP_Model,
-        'gcn2': GCNII_Model,
-        'adgn': ADGN_Model,
-        'gat': GAT_Model,
-        'gatv2': GAT_v2_Model,
-        'gt': GT_Model,
-        'gat-res': GAT_v2_Res_Model,
-        'fagcn': FAGCN_Model,
-        'gprgnn': GPR_GNN_Model,
-        'dagnn': DAGNN_Model,
-        'mixhop': MixHop_Model,
-        'graphsage':GraphSAGE,
-         }
 
-        Model = model_classes.get(self.args.model)
+        if self.args.model == 'aero': Model = AERO_GNN_Model
 
-        if Model is None:
-           raise ValueError(f"Unsupported model type: {self.args.model}")
+        if self.args.model == 'gcn': Model = GCN_Model
+        if self.args.model == 'appnp': Model = APPNP_Model
+
+        if self.args.model == 'gcn2': Model = GCNII_Model
+        if self.args.model == 'adgn': Model = ADGN_Model
+
+        if self.args.model == 'gat': Model = GAT_Model
+        if self.args.model == 'gatv2': Model = GAT_v2_Model
+        if self.args.model == 'gt': Model = GT_Model
+        if self.args.model == 'gat-res': Model = GAT_v2_Res_Model
+        if self.args.model == 'fagcn': Model = FAGCN_Model
+
+        if self.args.model == 'gprgnn': Model = GPR_GNN_Model
+        if self.args.model == 'dagnn': Model = DAGNN_Model
+        if self.args.model == 'mixhop': Model = MixHop_Model
+        if self.args.model == 'graphsage': Model = GraphSAGE
 
         self.model = Model(self.args,
                            self.in_channels,
@@ -73,31 +71,30 @@ class Trainer(object):
     def calculate_dirichlet_energy(self,X, edge_index):
         """
         Calculate the Dirichlet energy for a given feature matrix X and edge index.
-
+        
         Parameters:
         X (torch.Tensor): Feature matrix of shape (num_nodes, num_features)
         edge_index (torch.Tensor): Edge index matrix of shape (2, num_edges)
-
+        
         Returns:
         torch.Tensor: Dirichlet energy
         """
         num_nodes = X.size(0)
-
+        
         # Calculate node degrees
         degrees = torch.zeros(num_nodes, dtype=X.dtype, device=X.device)
         degrees.scatter_add_(0, edge_index[0], torch.ones(edge_index.size(1), dtype=X.dtype, device=X.device))
-
+        
         # Normalize features by sqrt(1 + degrees)
         norm_factors = torch.sqrt(1 + degrees).unsqueeze(1)
         X_norm = X / norm_factors
-
+        
         # Compute differences between connected nodes
         diff = X_norm[edge_index[0]] - X_norm[edge_index[1]]
-
+        
         #l2 norm
         dirichlet_energy =torch.norm(diff, p=2, dim=1).sum()/ num_nodes
-        return dirichlet_energy / 2
-
+        return dirichlet_energy / 2   
     
     def eval(self, index_set):
 
