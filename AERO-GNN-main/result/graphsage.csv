@@ -17,3 +17,13 @@ layer,epoch,Model,n trials,dataset,Mean test accuracy,std deviation,Mean Dirichl
 2,2000,graphsage,50,pubmed,0.4134,0.022,0.1987,0.037
 4,2000,graphsage,50,pubmed,0.4119,0.020,0.2599,0.058
 8,2000,graphsage,50,pubmed,0.4099,0.003,0.2973,0.075
+16,2000,graphsage,50,pubmed,0.4093,0.003,0.2898,0.088
+32,2000,graphsage,50,pubmed,0.4099,0.003,0.2984,0.076
+64,2000,graphsage,50,pubmed,0.4094,0.003,0.2971,0.093
+1,2000,graphsage,50,computers,0.3745,0.000,1.6683,0.024
+2,2000,graphsage,50,computers,0.3745,0.000,2.1776,0.082
+4,2000,graphsage,50,computers,0.3745,0.000,2.6016,0.161
+8,2000,graphsage,50,computers,0.3745,0.000,3.0237,0.276
+16,2000,graphsage,50,computers,0.3745,0.000,3.0297,0.225
+32,2000,graphsage,50,computers,0.3745,0.000,2.9976,0.240
+64,2000,graphsage,50,computers,0.3745,0.000,3.0345,0.195

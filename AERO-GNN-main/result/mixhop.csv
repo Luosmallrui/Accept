@@ -10,3 +10,5 @@ layer,epoch,Model,n trials,dataset,Mean test accuracy,std deviation,Mean Dirichl
 1,2000,mixhop,50,wiki,0.5313,0.012,2.2990,0.089
 2,2000,mixhop,50,wiki,0.5311,0.011,2.3038,0.099
 4,2000,mixhop,50,wiki,0.2288,0.001,0.7682,0.145
+8,2000,mixhop,50,wiki,0.2286,0.001,0.7658,0.128
+16,2000,mixhop,50,wiki,0.2288,0.001,0.7609,0.129
