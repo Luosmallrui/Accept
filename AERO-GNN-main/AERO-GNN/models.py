@@ -233,8 +233,9 @@ class APPNP_Model(MessagePassing):
         h = self.node_label_pred(x)
         edge_index, a = gcn_norm(edge_index, num_nodes = self.num_nodes, add_self_loops=False)
         z = self.ppr_propagate(a, h, edge_index)
+        z1=self.node_label_pred(z)
 
-        return z,z
+        return z,z1
 
     def message(self, x_j: Tensor, edge_weight: OptTensor) -> Tensor:
         return x_j * edge_weight.view(-1, 1)
