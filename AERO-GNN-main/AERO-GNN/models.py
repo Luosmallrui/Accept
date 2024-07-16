@@ -959,6 +959,9 @@ class GraphSAGE(nn.Module):
         self.reset_parameters()
         
     def setup_layers(self):
+        # Input layer: Linear layer
+        self.input_linear = nn.Linear(self.in_channels, self.hid_channels)
+
 
         self.convs = nn.ModuleList()
         for i in range(self.args.num_layers):#num_layers
@@ -966,9 +969,8 @@ class GraphSAGE(nn.Module):
                SAGEConv(self.hid_channels, self.hid_channels)
                 )
 
-        self.convs[0] = SAGEConv(self.in_channels, self.hid_channels)
-
-        self.convs[-1] = SAGEConv(self.hid_channels, self.out_channels)
+        # Output layer: Linear layer
+        self.output_linear = nn.Linear(self.hid_channels, self.out_channels)
 
         self.dropout = nn.Dropout(self.args.dropout)
         self.elu = F.elu
@@ -979,10 +981,11 @@ class GraphSAGE(nn.Module):
  
     def forward(self, x, edge_index):
         x = self.dropout(x)
+        x = self.input_linear(x)
         for i in range(self.args.num_layers - 1):
             x = self.convs[i](x, edge_index)
             x = self.elu(x)
             x = self.dropout(x)
-        x1 = self.convs[-1](x, edge_index)
+        x1 = self.output_linear(x)
 
         return x,x1 
