@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define arrays for datasets and iterations
-datasets=( "actor")
+datasets=( "actor" )
 iterations=( 1 2 4 8 16 32 64)
 
 # Loop through each dataset and each iteration value
