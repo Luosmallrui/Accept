@@ -17,6 +17,7 @@ control = {
     "adgn" :  "iterations",
     "fagcn" : "iterations",
     "graphsage": "num_layers",
+    "gcn": "num_layers",
 }
 
 

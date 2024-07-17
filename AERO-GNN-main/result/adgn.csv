@@ -26,3 +26,4 @@ layer,epoch,Model,n trials,dataset,Mean test accuracy,std deviation,Mean Dirichl
 8,2000,adgn,50,computers,0.3745,0.000,2.0574,0.035
 16,2000,adgn,50,computers,0.3745,0.000,2.4898,0.049
 32,2000,adgn,50,computers,0.3745,0.000,4.5022,1.245
+64,2000,adgn,50,computers,0.4458,0.031,14.3387,2.482
