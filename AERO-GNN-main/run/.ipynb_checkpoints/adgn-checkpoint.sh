@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define arrays for datasets and iterations
-datasets=( "computers")
+datasets=( "cora")
 iterations=( 64)
 
 # Loop through each dataset and each iteration value
