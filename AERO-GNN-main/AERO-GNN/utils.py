@@ -1,16 +1,20 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri May 10 14:32:29 2024
+
+@author: wangranr
+"""
 
 import random
 import numpy as np
 import torch
+from torch_geometric.sampler.base import DataType
+from filtered_datasets import Filtered_Dataset as filtered_dataset
 import torch_geometric.transforms as T
 from torch_geometric.datasets import Planetoid, Amazon, WikiCS, WebKB, WikipediaNetwork, Actor
 from torch_geometric.utils import remove_self_loops
-from filtered_datasets import Filtered_Dataset as filtered_dataset
-import pdb
-
-
-
 def load_graph(args):
+    graph=None
     
     if args.dataset in ['cora', 'citeseer', 'pubmed']:
         graph = Planetoid(root='../graph-data', name=args.dataset.capitalize(), split = 'public')[0]
@@ -21,7 +25,7 @@ def load_graph(args):
     elif args.dataset == 'wiki':
         graph = WikiCS(root='../graph-data/Wiki-CS', is_undirected=True)[0]
         graph.edge_index, _ = remove_self_loops(graph.edge_index)
-        transform = T.Compose([T.AddSelfLoops(), T.ToUndirected(),])
+        transform = T.Compose([T.AddSelfLoops()])
         graph = transform(graph)
 
     elif args.dataset in ['photo', 'computers']:
@@ -37,7 +41,7 @@ def load_graph(args):
         graph = transform(graph)
 
     elif args.dataset in ['squirrel', 'chameleon']:
-        graph = WikipediaNetwork(root='../graph-data', name=args.dataset.capitalize())[0]
+        graph = WikipediaNetwork(root='./graph-data', name=args.dataset.capitalize())[0]
         graph.edge_index, _ = remove_self_loops(graph.edge_index)
         transform = T.Compose([T.AddSelfLoops(), T.ToUndirected(),])
         graph = transform(graph)
@@ -53,11 +57,12 @@ def load_graph(args):
         graph.edge_index, _ = remove_self_loops(graph.edge_index)
         transform = T.Compose([T.AddSelfLoops(), T.ToUndirected(),])
         graph = transform(graph)
+    # if DataType.from_data(graph) != DataType.homogeneous:
+    #     graph=graph.to_homogeneous()
 
     return graph
 
-
-
+        
 def fixed_split(args, graph, exp_num):
 
     num_nodes = graph.x.size(0)
@@ -80,8 +85,7 @@ def fixed_split(args, graph, exp_num):
         else:
             train_idx = torch.nonzero(graph.train_mask).squeeze()
             test_idx = torch.nonzero(graph.test_mask).squeeze()
-            val_idx = torch.nonzero(graph.val_mask).squeeze()
-            
+            val_idx = torch.nonzero(graph.val_mask).squeeze()        
     else:
         print('No train_mask found.')
         train_idx, val_idx, test_idx=random_splits(graph)
@@ -127,15 +131,13 @@ def sparse_split(graph, train_ratio, val_ratio):
     assert torch.equal(all_idx, torch.arange(num_nodes))
 
     return train_idx, val_idx, test_idx
-
-
 def init_optimizer(args, model):
 
-    if args.model == 'aero':
+    if args.model == 'apo':
         optimizer = torch.optim.Adam([
             {'params': model.dense_lins.parameters(),
             'weight_decay': args.dr},
-            {'params': model.atts.parameters(),
+            {'params': model.out_lin.parameters(),
             'weight_decay': args.dr_prop},
             {'params': model.hop_atts.parameters(),
             'weight_decay': args.dr_prop},

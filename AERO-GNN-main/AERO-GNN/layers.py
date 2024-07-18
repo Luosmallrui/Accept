@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Jul 16 11:02:19 2024
+
+@author: wangranr
+"""
+
 import math
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
@@ -377,4 +384,3 @@ class GATv2_Conv(MessagePassing):
     def __repr__(self) -> str:
         return (f'{self.__class__.__name__}({self.in_channels}, '
                 f'{self.out_channels}, heads={self.heads})')
-
