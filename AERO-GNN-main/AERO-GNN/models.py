@@ -399,7 +399,7 @@ class GCN_Model(MessagePassing):
         self.num_nodes = graph.x.size(0)
 
         self.setup_layers()
-        self.reset_parameters()
+        # self.reset_parameters()
 
     def setup_layers(self):
 

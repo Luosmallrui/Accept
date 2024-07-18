@@ -23,7 +23,6 @@ from torch_scatter import scatter_add
 from layers import GATv2_Conv, FA_Conv, MixHopConv, AntiSymmetricConv
 
 
-
 class AERO_GNN_Model(MessagePassing):
 
     def __init__(self, args, in_channels, hid_channels, out_channels, graph,):
@@ -200,7 +199,6 @@ class APPNP_Model(MessagePassing):
         self.linear_node_2.reset_parameters()
 
     def node_label_pred(self, x):
-        print("Shape of x before processing:", x.shape)
         
         x = self.dropout(x)
 
@@ -401,19 +399,20 @@ class GCN_Model(MessagePassing):
         self.num_nodes = graph.x.size(0)
 
         self.setup_layers()
-        self.reset_parameters()
+        # self.reset_parameters()
 
     def setup_layers(self):
 
         self.convs = nn.ModuleList()
 
         # Input layer: Linear layer
-        self.input_linear = nn.Linear(self.in_channels, self.hid_channels)
+        # self.input_linear = nn.Linear(self.in_channels, self.hid_channels)
 
         # Hidden layers: GCN layers
         for _ in range(self.num_layers):
             self.convs.append(
                 GCNConv(self.hid_channels, self.hid_channels, cached=True, normalize=True))
+        self.convs[0] = GCNConv(self.in_channels, self.hid_channels, cached=True, normalize=True)
 
         # Output layer: Linear layer
         self.output_linear = nn.Linear(self.hid_channels, self.out_channels)
@@ -431,10 +430,6 @@ class GCN_Model(MessagePassing):
 
         x = self.dropout(x)
 
-        # Input layer
-        x = self.input_linear(x)
-        x = self.relu(x)
-        x = self.dropout(x)
 
         # Hidden layers
         for conv in self.convs:
@@ -606,7 +601,7 @@ class GAT_v2_Res_Model(nn.Module):
         
         x = self.dropout(x)
         x = self.input_linear(x)
-        for i in range(self.args.num_layers - 1):
+        for i in range(self.args.num_layers):
             x, alpha_unnorm, alpha_norm, x_lin = self.convs[i](x, edge_index, return_attention_weights = True)        
             if i == 0: x0 = x_lin.view(-1, self.hid_channels * self.num_heads)
             x = x * (1 - self.alpha)  +  x0 * self.alpha            
@@ -711,7 +706,7 @@ class FAGCN_Model(MessagePassing):
                                     cached = True,
                                     add_self_loops = False,
                                     normalize = True,
-                                    )
+                                    return_attention_weights = True,)
                                     )
 
         self.dropout = nn.Dropout(self.args.dropout)
@@ -783,7 +778,7 @@ class GT_Model(nn.Module):#通过num_layers控制
         
         x = self.dropout(x)
         x = self.input_linear(x)
-        for i in range(self.args.num_layers - 1):
+        for i in range(self.args.num_layers):
             x = self.convs[i](x, edge_index)
             x = self.elu(x)
             x = self.dropout(x)
@@ -919,7 +914,7 @@ class GraphSAGE(nn.Module):
         
     def setup_layers(self):
         # Input layer: Linear layer
-        self.input_linear = nn.Linear(self.in_channels, self.hid_channels)
+        # self.input_linear = nn.Linear(self.in_channels, self.hid_channels)
 
 
         self.convs = nn.ModuleList()
@@ -927,6 +922,7 @@ class GraphSAGE(nn.Module):
             self.convs.append(
                SAGEConv(self.hid_channels, self.hid_channels)
                 )
+        self.convs[0]=SAGEConv(self.in_channels, self.hid_channels)
 
         # Output layer: Linear layer
         self.output_linear = nn.Linear(self.hid_channels, self.out_channels)
@@ -940,11 +936,12 @@ class GraphSAGE(nn.Module):
  
     def forward(self, x, edge_index):
         x = self.dropout(x)
-        x = self.input_linear(x)
-        for i in range(self.args.num_layers - 1):
+        # x = self.input_linear(x)
+        for i in range(self.args.num_layers ):
             x = self.convs[i](x, edge_index)
             x = self.elu(x)
             x = self.dropout(x)
+        # print("x:",x.size())
+        # print("self.hid_channels:",self.hid_channels)
         x1 = self.output_linear(x)
-
-        return x,x1 
+        return x,x1

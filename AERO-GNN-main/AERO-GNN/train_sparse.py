@@ -67,6 +67,8 @@ class Trainer(object):
         """
         train/val/test split
         """
+        if self.args.split=="":
+            self.args.split="fixed"
         if self.args.split == 'fixed': split = fixed_split(self.args, self.graph, self.exp)
         if self.args.split == 'sparse': split = sparse_split(self.graph, 0.025, 0.025)
         self.train_nodes, self.validation_nodes, self.test_nodes = split

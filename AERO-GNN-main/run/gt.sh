@@ -1,4 +1,4 @@
-python ./AERO-GNN/main.py --model gt --dataset cora --dr 0.001 --dropout 0.8 --lambd-l2 0.0 --hid-dim 8 --num-heads 8 --num-layers 3 
+python ../AERO-GNN/main.py --model gt --dataset cora --dr 0.001 --dropout 0.8 --lambd-l2 0.0 --hid-dim 8 --num-heads 8 --num-layers 3 
 python ./AERO-GNN/main.py --model gt --dataset citeseer --dr 0.0005 --dropout 0.6 --lambd-l2 0.0 --hid-dim 8 --num-heads 8 --num-layers 2 
 python ./AERO-GNN/main.py --model gt --dataset pubmed --dr 0.0005 --dropout 0.5 --lambd-l2 0.0005  --hid-dim 8 --num-heads 8 --num-layers 2 
 python ./AERO-GNN/main.py --model gt --dataset wiki --dr 0.0005 --dropout 0.5 --lambd-l2 0.0  --hid-dim 8 --num-heads 8 --num-layers 2 
