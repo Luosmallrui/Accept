@@ -479,7 +479,7 @@ class GAT_v2_Model(nn.Module):
                     share_weights = True,
                     )
         # Output layer: Linear layer
-        self.output_linear = nn.Linear(self.hid_channels, self.out_channels)
+        self.output_linear = nn.Linear(self.hid_channels*self.num_heads, self.out_channels)
         self.dropout = nn.Dropout(self.args.dropout)
         self.elu = F.elu
 
@@ -541,7 +541,7 @@ class GAT_Model(nn.Module):
                 )
 
         # Final GATConv layer
-        self.final_conv=nn.Linear(self.hid_channels, self.out_channels)
+        self.final_conv=nn.Linear(self.hid_channels*self.num_heads, self.out_channels)
 
         self.dropout = nn.Dropout(self.args.dropout)
         self.elu = F.elu
@@ -601,7 +601,7 @@ class GAT_v2_Res_Model(nn.Module):
                      share_weights = True,
                      )
         # Output layer: Linear layer
-        self.output_linear = nn.Linear(self.hid_channels, self.out_channels)
+        self.output_linear = nn.Linear(self.hid_channels*self.num_heads, self.out_channels)
         self.dropout = nn.Dropout(self.args.dropout)
         self.elu = F.elu
 
@@ -766,14 +766,14 @@ class GT_Model(nn.Module):#通过num_layers控制
         self.convs = nn.ModuleList()
         for i in range(self.args.num_layers):
             self.convs.append(
-                TransformerConv(self.hid_channels, self.hid_channels,
+                TransformerConv(self.hid_channels , self.hid_channels ,
                             heads = self.num_heads,
                             concat = True,
                             dropout = self.args.dropout,
                             beta = False,
                             )
                 )
-        self.convs[0]= TransformerConv(self.in_channels, self.hid_channels,
+        self.convs[0]= TransformerConv(self.in_channels, self.hid_channels ,
                      heads = self.num_heads,
                      concat = True,
                      dropout = self.args.dropout,
@@ -781,7 +781,7 @@ class GT_Model(nn.Module):#通过num_layers控制
                      )
 
         # Output layer: Linear layer
-        self.output_linear = nn.Linear(self.hid_channels, self.out_channels)
+        self.output_linear = nn.Linear(self.hid_channels*self.num_heads, self.out_channels)
 
         self.dropout = nn.Dropout(self.args.dropout)
         self.elu = F.elu
@@ -800,6 +800,7 @@ class GT_Model(nn.Module):#通过num_layers控制
             x = self.convs[i](x, edge_index)
             x = self.elu(x)
             x = self.dropout(x)
+        # print("x.size()",x.size())
 
         x1 = self.output_linear(x)
 
