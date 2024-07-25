@@ -98,14 +98,16 @@ class Trainer(object):
         degrees.scatter_add_(0, edge_index[0], torch.ones(edge_index.size(1), dtype=X.dtype, device=X.device))
         
         # Normalize features by sqrt(1 + degrees)
-        norm_factors = torch.sqrt(1 + degrees).unsqueeze(1)
-        X_norm = X / norm_factors
+        norm_factors_i = torch.sqrt(1 + degrees[edge_index[0]]).unsqueeze(1)
+        norm_factors_j = torch.sqrt(1 + degrees[edge_index[1]]).unsqueeze(1)
+        X_norm_i = X[edge_index[0]] / norm_factors_i
+        X_norm_j = X[edge_index[1]] / norm_factors_j
         
         # Compute differences between connected nodes
-        diff = X_norm[edge_index[0]] - X_norm[edge_index[1]]
+        diff = X_norm_i - X_norm_j
         
-        #l2 norm
-        dirichlet_energy =torch.norm(diff, p=2, dim=1).sum()/ num_nodes
+        # L2 norm
+        dirichlet_energy = torch.norm(diff, p=2, dim=1).pow(2).sum() / num_nodes
         return dirichlet_energy / 2   
         
     def eval(self, index_set):
