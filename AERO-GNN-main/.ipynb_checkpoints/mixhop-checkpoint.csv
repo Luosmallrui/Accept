@@ -1,4 +1,0 @@
-layer,epoch,Model,n trials,dataset,Mean test accuracy,std deviation,Mean Dirichlet energy,std Dirichlet energy
-1,2000,mixhop,50,wiki,0.7767,0.007,0.0000,0.000
-2,2000,mixhop,50,wiki,0.7765,0.006,0.0000,0.000
-4,2000,mixhop,50,wiki,0.7235,0.024,0.0000,0.000

@@ -1,2 +1,0 @@
-layer,epoch,Model,n trials,dataset,Mean test accuracy,std deviation,Mean Dirichlet energy,std Dirichlet energy
-1,2000,gat,50,wiki,0.7951,0.007,11.5749,0.662
