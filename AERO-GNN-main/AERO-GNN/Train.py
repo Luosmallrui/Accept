@@ -252,7 +252,7 @@ class Trainer(object):
         avg_dirichlet_energy = self.avg_dirichlet_energy
         std_dirichlet_energy = self.std_dirichlet_energy
 
-        csv_file = 'res.csv'
+        csv_file = f'../results/{self.args.model}.csv'
         header = ['layer', 'epoch', 'Model', 'n trials', 'dataset', 'Mean test accuracy', 'std deviation',
                   'Mean Dirichlet energy', 'std Dirichlet energy']
 
