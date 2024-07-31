@@ -12,3 +12,10 @@ layer,epoch,Model,n trials,dataset,Mean test accuracy,std deviation,Mean Dirichl
 8,2000,gat-res,20,citeseer,0.5746,0.047,3.7544,1.427
 16,2000,gat-res,20,citeseer,0.6089,0.039,0.7418,0.650
 32,2000,gat-res,20,citeseer,0.6037,0.042,0.4673,0.373
+<<<<<<< HEAD
+=======
+64,2000,gat-res,20,citeseer,0.5848,0.043,0.3150,0.301
+1,2000,gat-res,20,pubmed,0.7754,0.004,0.0514,0.008
+2,2000,gat-res,20,pubmed,0.7792,0.007,0.4033,0.181
+4,2000,gat-res,20,pubmed,0.7651,0.011,3.7755,2.956
+>>>>>>> 065a639 (update)
