@@ -1,0 +1,14 @@
+layer,epoch,Model,n trials,dataset,Mean test accuracy,std deviation,Mean Dirichlet energy,std Dirichlet energy
+1,2000,gat-res,20,cora,0.7671,0.009,0.0340,0.014
+2,2000,gat-res,20,cora,0.7793,0.014,0.5728,0.244
+4,2000,gat-res,20,cora,0.7570,0.021,5.5236,2.736
+8,2000,gat-res,20,cora,0.7311,0.026,16.9831,6.931
+16,2000,gat-res,20,cora,0.7451,0.056,3.2337,1.857
+32,2000,gat-res,20,cora,0.7174,0.069,2.0260,1.816
+64,2000,gat-res,20,cora,0.7288,0.061,2.2179,1.745
+1,2000,gat-res,20,citeseer,0.6846,0.010,0.0114,0.004
+2,2000,gat-res,20,citeseer,0.6817,0.015,0.0433,0.033
+4,2000,gat-res,20,citeseer,0.6319,0.024,1.4585,0.848
+8,2000,gat-res,20,citeseer,0.5746,0.047,3.7544,1.427
+16,2000,gat-res,20,citeseer,0.6089,0.039,0.7418,0.650
+32,2000,gat-res,20,citeseer,0.6037,0.042,0.4673,0.373
