@@ -199,24 +199,18 @@ class APPNP_Model(MessagePassing):
         self.linear_node_2.reset_parameters()
 
     def node_label_pred(self, x):
+       
+        # x = self.dropout(x)
         
-        x = self.dropout(x)
-
-        h = self.linear_node_1(x)
-        h = self.relu(h)
-        h = self.dropout(h)
-                
+        h = self.relu(x)
+        h = self.dropout(h)               
         h = self.linear_node_2(h)
-
         return h
 
     def ppr_propagate(self, a, h, edge_index):
-
         z = h
-
-        for k in range(self.K):
+        for k in range(self.K+1):
             a_drop = self.dropout(a)
-
             z = self.propagate(edge_index = edge_index, 
                                 x=z, 
                                 edge_weight = a_drop,
@@ -224,12 +218,11 @@ class APPNP_Model(MessagePassing):
 
             z = z * (1-self.alpha)
             z += h * self.alpha
-
         return z
         
     def forward(self, x, edge_index):
-        
-        h = self.node_label_pred(x)
+        # print("x:",x.size(),"in:",self.in_channels)
+        h = self.linear_node_1(x)
         edge_index, a = gcn_norm(edge_index, num_nodes = self.num_nodes, add_self_loops=False)
         z = self.ppr_propagate(a, h, edge_index)
         z1=self.node_label_pred(z)
@@ -421,7 +414,7 @@ class GCN_Model(MessagePassing):
         self.relu = F.relu
 
     def reset_parameters(self):
-        self.input_linear.reset_parameters()
+        # self.input_linear.reset_parameters()
         for conv in self.convs:
             conv.reset_parameters()
         self.output_linear.reset_parameters()
