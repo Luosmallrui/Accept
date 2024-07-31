@@ -281,8 +281,8 @@ class GPR_GNN_Model(MessagePassing):
         
         x = self.dropout(x)
         
-        h = self.linear_node_1(x)
-        h = self.relu(h)
+        
+        h = self.relu(x)
         h = self.dropout(h)
 
         h = self.linear_node_2(h)
@@ -304,7 +304,7 @@ class GPR_GNN_Model(MessagePassing):
         
     def forward(self, x, edge_idx):
         
-        h = self.node_label_pred(x)
+        h = self.linear_node_1(x)
         edge_idx, a = gcn_norm(edge_idx, num_nodes = self.num_nodes, add_self_loops=False)
         z = self.gpr_propagate(a, h, edge_idx)
         z1= self.node_label_pred(z)
