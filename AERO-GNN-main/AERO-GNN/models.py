@@ -209,7 +209,7 @@ class APPNP_Model(MessagePassing):
 
     def ppr_propagate(self, a, h, edge_index):
         z = h
-        for k in range(self.K+1):
+        for k in range(self.K):
             a_drop = self.dropout(a)
             z = self.propagate(edge_index = edge_index, 
                                 x=z, 
