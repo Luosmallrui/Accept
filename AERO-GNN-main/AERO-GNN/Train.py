@@ -18,6 +18,23 @@ from models import *
  
 from utils import fixed_split, sparse_split, init_optimizer
 
+model_metrics = {
+    'aero': "iterations",
+    'gcn': "num_layers",
+    'appnp': "iterations",
+    'gcn2': "num_layers",
+    'adgn': "iterations",
+    'gat': "num_layers",
+    'gatv2': "num_layers",
+    'gt': "num_layers",
+    'gat-res': "num_layers",
+    'fagcn': "iterations",
+    'gprgnn': "iterations",
+    'dagnn': "iterations",
+    'mixhop': "num_layers",
+    'graphsage': "num_layers",
+}
+
 class Trainer(object):
 
     def __init__(self, args, graph):
@@ -36,34 +53,32 @@ class Trainer(object):
            
 
     def create_model(self):
+        # Define a dictionary mapping model names to model classes
+        model_map = {
+            'aero': AERO_GNN_Model,
+            'gcn': GCN_Model,
+            'appnp': APPNP_Model,
+            'gcn2': GCNII_Model,
+            'adgn': ADGN_Model,
+            'gat': GAT_Model,
+            'gatv2': GAT_v2_Model,
+            'gt': GT_Model,
+            'gat-res': GAT_v2_Res_Model,
+            'fagcn': FAGCN_Model,
+            'gprgnn': GPR_GNN_Model,
+            'dagnn': DAGNN_Model,
+            'mixhop': MixHop_Model,
+            'graphsage': GraphSAGE  # GraphSAGE1
+        }
 
-        if self.args.model == 'aero': Model = AERO_GNN_Model
+        # Get the model class based on the model name
+        Model = model_map.get(self.args.model, None)
 
-        if self.args.model == 'gcn': Model = GCN_Model
-        if self.args.model == 'appnp': Model = APPNP_Model
+        if Model is None:
+            raise ValueError(f"Model '{self.args.model}' is not recognized.")
 
-        if self.args.model == 'gcn2': Model = GCNII_Model
-        if self.args.model == 'adgn' : Model = ADGN_Model
-
-        if self.args.model == 'gat': Model = GAT_Model
-        if self.args.model == 'gatv2': Model = GAT_v2_Model
-        if self.args.model == 'gt': Model = GT_Model
-        if self.args.model == 'gat-res' : Model = GAT_v2_Res_Model
-        if self.args.model == 'fagcn': Model = FAGCN_Model
-
-        if self.args.model == 'gprgnn': Model = GPR_GNN_Model
-        if self.args.model == 'dagnn': Model = DAGNN_Model
-        if self.args.model == 'mixhop': Model = MixHop_Model
-      
-        if self.args.model == 'graphsage': Model =GraphSAGE#GraphSAGE1
-    
-      
-
-        self.model = Model(self.args, self.in_channels,
-                            self.hid_channels,
-                            self.out_channels,
-                            self.graph,
-                            )
+        # Instantiate the model
+        self.model = Model(self.args, self.in_channels, self.hid_channels, self.out_channels, self.graph)
                 
     def data_split(self):
 
@@ -212,16 +227,22 @@ class Trainer(object):
         self.std_acc = torch.std(torch.tensor(acc)).item()
         self.avg_dirichlet_energy = sum(dirichlet_energies) / len(dirichlet_energies)
         self.std_dirichlet_energy = torch.std(torch.tensor(dirichlet_energies)).item()
-        
-        print(f"layer:{self.args.num_layers}")
+        layer_metrics = model_metrics.get(self.args.model)
+        if layer_metrics == "iterations":
+            layer = self.args.iterations
+        else:
+            layer = self.args.num_layers
+        print(f"layer:{layer}")
         print("epoch", self.args.epochs)
         print("Model: {}".format(self.args.model))
         print('n trials: {}'.format(self.args.exp_num))
         print('dataset: {}'.format(self.args.dataset))
         print("Mean test accuracy: {:.4f}".format(self.avg_acc), "±", '{:.3f}'.format(self.std_acc))
-        print("Mean Dirichlet energy: {:.4f}".format(self.avg_dirichlet_energy), "±", '{:.3f}'.format(self.std_dirichlet_energy))
-        
-        iterations = self.args.num_layers
+        print("Mean Dirichlet energy: {:.4f}".format(self.avg_dirichlet_energy), "±",
+              '{:.3f}'.format(self.std_dirichlet_energy))
+        self.log_results(layer)
+
+    def log_results(self, layer):
         epoch = self.args.epochs
         model = self.args.model
         n_trials = self.args.exp_num
@@ -230,12 +251,21 @@ class Trainer(object):
         std_acc = self.std_acc
         avg_dirichlet_energy = self.avg_dirichlet_energy
         std_dirichlet_energy = self.std_dirichlet_energy
-    
+
         csv_file = 'res.csv'
+        header = ['layer', 'epoch', 'Model', 'n trials', 'dataset', 'Mean test accuracy', 'std deviation',
+                  'Mean Dirichlet energy', 'std Dirichlet energy']
+
+        # Check if file exists and write header if it doesn't
         file_exists = os.path.isfile(csv_file)
         with open(csv_file, mode='a', newline='') as file:
             writer = csv.writer(file)
             if not file_exists:
-                writer.writerow(
-                    ['layer', 'epoch', 'Model', 'n trials', 'dataset', 'Mean test accuracy', 'std deviation', 'Mean Dirichlet energy', 'std Dirichlet energy'])
-            writer.writerow([iterations, epoch, model, n_trials, dataset, f"{avg_acc:.4f}", f"{std_acc:.3f}", f"{avg_dirichlet_energy:.4f}", f"{std_dirichlet_energy:.3f}"])
+                writer.writerow(header)
+
+            # Write the results
+            writer.writerow([
+                layer, epoch, model, n_trials, dataset,
+                f"{avg_acc:.4f}", f"{std_acc:.3f}",
+                f"{avg_dirichlet_energy:.4f}", f"{std_dirichlet_energy:.3f}"
+            ])
