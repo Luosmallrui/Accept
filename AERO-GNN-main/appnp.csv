@@ -1,8 +1,0 @@
-layer,epoch,Model,n trials,dataset,Mean test accuracy,std deviation,Mean Dirichlet energy,std Dirichlet energy
-1,2000,appnp,50,actor,0.3041,0.009,0.0000,0.000
-2,2000,appnp,50,actor,0.3160,0.009,0.0000,0.000
-4,2000,appnp,50,actor,0.3122,0.012,0.0000,0.000
-8,2000,appnp,50,actor,0.3157,0.013,0.0000,0.000
-16,2000,appnp,50,actor,0.3226,0.011,0.0000,0.000
-32,2000,appnp,50,actor,0.3208,0.011,0.0000,0.000
-64,2000,appnp,50,actor,0.3226,0.010,0.0000,0.000
