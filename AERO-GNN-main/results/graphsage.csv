@@ -39,3 +39,5 @@ layer,epoch,Model,n trials,dataset,Mean test accuracy,std deviation,Mean Dirichl
 4,2000,graphsage,20,computers,0.8923,0.007,29.6714,4.202
 8,2000,graphsage,20,computers,0.5079,0.149,19.8668,24.888
 16,2000,graphsage,20,computers,0.3933,0.032,7.7829,8.960
+32,2000,graphsage,20,computers,0.3745,0.000,12.3844,20.948
+64,2000,graphsage,20,computers,0.3745,0.000,4.4365,4.159
