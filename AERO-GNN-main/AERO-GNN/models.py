@@ -420,7 +420,7 @@ class GCN_Model(MessagePassing):
         self.output_linear.reset_parameters()
 
     def forward(self, x, edge_index):
-        x = self.dropout(x)
+        # x = self.dropout(x)
         # Hidden layers
         for conv in self.convs:
             x = conv(x, edge_index)
