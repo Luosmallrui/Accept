@@ -456,7 +456,7 @@ class GAT_v2_Model(nn.Module):
             self.convs.append(
                 GATv2_Conv(self.hid_channels, self.hid_channels,
                             heads = self.num_heads,
-                            concat = True,
+                            concat = False,
                             negative_slope=0.2,
                             dropout = self.args.dropout,
                             add_self_loops = False,
@@ -465,14 +465,14 @@ class GAT_v2_Model(nn.Module):
                 )
         self.convs[0]=GATv2_Conv(self.in_channels, self.hid_channels,
                     heads = self.num_heads,
-                    concat = True,
+                    concat = False,
                     negative_slope=0.2,
                     dropout = self.args.dropout,
                     add_self_loops = False,
                     share_weights = True,
                     )
         # Output layer: Linear layer
-        self.output_linear = nn.Linear(self.hid_channels*self.num_heads, self.out_channels)
+        self.output_linear = nn.Linear(self.hid_channels, self.out_channels)
         self.dropout = nn.Dropout(self.args.dropout)
         self.elu = F.elu
 
@@ -482,7 +482,7 @@ class GAT_v2_Model(nn.Module):
 
     def forward(self, x, edge_index):       
 
-        x = self.dropout(x)
+        # x = self.dropout(x)
         # x = self.input_linear(x)
         for i in range(self.args.num_layers ):
             x, alpha_unnorm, alpha_norm, x_lin = self.convs[i](x, edge_index, return_attention_weights = True)
@@ -514,27 +514,27 @@ class GAT_Model(nn.Module):
 
         # Add GATConv layers for hidden layers
         for i in range(self.num_layers):
-            if i == 0:
-                self.convs.append(
-                    GATConv(self.in_channels, self.hid_channels,
-                            heads=self.num_heads,
-                            concat=True,
-                            negative_slope=0.2,
-                            dropout=self.args.dropout,
-                            add_self_loops=False)
-                )
-            else:
-                self.convs.append(
-                    GATConv(self.hid_channels , self.hid_channels,
-                            heads=self.num_heads,
-                            concat=True,
-                            negative_slope=0.2,
-                            dropout=self.args.dropout,
-                            add_self_loops=False)
-                )
+             
+            self.convs.append(
+                GATConv(self.hid_channels , self.hid_channels,
+                        heads=self.num_heads,
+                        concat=False,
+                        negative_slope=0.2,
+                        dropout=self.args.dropout,
+                        add_self_loops=False)
+            )
+        self.convs[0]=GATConv(self.in_channels, self.hid_channels,
+                    heads = self.num_heads,
+                    concat = False,
+                    negative_slope=0.2,
+                    dropout = self.args.dropout,
+                    add_self_loops = False,
+                  
+                    )
+        
 
         # Final GATConv layer
-        self.final_conv=nn.Linear(self.hid_channels*self.num_heads, self.out_channels)
+        self.final_conv=nn.Linear(self.hid_channels, self.out_channels)
 
         self.dropout = nn.Dropout(self.args.dropout)
         self.elu = F.elu
@@ -544,8 +544,10 @@ class GAT_Model(nn.Module):
             conv.reset_parameters()
 
     def forward(self, x, edge_index):
-        for conv in self.convs:
-            x = self.elu(conv(x, edge_index))
+        for conv in self.convs:      
+            # print("####",x.size())
+            x=conv(x, edge_index)
+            x = self.elu(x)
             x = self.dropout(x)
 
         x1 = self.final_conv(x)
