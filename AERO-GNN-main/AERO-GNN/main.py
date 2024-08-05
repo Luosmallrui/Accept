@@ -26,7 +26,7 @@ def parameter_parser():
     parser.add_argument("--layers", type=int, default= 2, )
     parser.add_argument("--walk-length", type=int, default=100, )
     parser.add_argument("--walks-per-node", type=int, default=6, )
-    parser.add_argument("--batch-size", type=int, default= 32, )
+    parser.add_argument("--batch-size", type=int, default= 128, )
     """HYPERPARAMETERS"""   
     parser.add_argument("--iterations", type=int, default=1) # L_P
     parser.add_argument("--num-layers", type = int, default =1) # L_M
