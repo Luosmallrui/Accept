@@ -761,7 +761,7 @@ class GT_Model(nn.Module):#通过num_layers控制
         self.convs = nn.ModuleList()
         for i in range(self.args.num_layers):
             self.convs.append(
-                TransformerConv(self.hid_channels , self.hid_channels ,
+                TransformerConv(self.hid_channels*self.num_heads , self.hid_channels ,
                             heads = self.num_heads,
                             concat = True,
                             dropout = self.args.dropout,
